@@ -63,9 +63,16 @@ export default class CartManager {
 
       pid = Number(pid);
 
+      if (product.initialStock < quantity) {
+        throw new ErrorManager(
+          `No hay stock suficiente. Stock disponible: ${product.initialStock}`,
+          400
+        );
+      }
+
       if (product.stock < quantity) {
         throw new ErrorManager(
-          `No hay stock suficiente. Stock disponible: ${product.stock}`,
+          `No hay suficiente stock restante. Stock disponible: ${product.stock}`,
           400
         );
       }
@@ -102,9 +109,9 @@ export default class CartManager {
         );
       }
 
-      if (product.stock < quantity) {
+      if (quantity > product.initialStock) {
         throw new ErrorManager(
-          `No hay suficiente stock. Stock disponible: ${product.stock}`,
+          `No hay suficiente stock disponible. Stock inicial: ${product.initialStock}`,
           400
         );
       }
@@ -114,23 +121,35 @@ export default class CartManager {
       );
 
       if (productIndex >= 0) {
-        const currentQuantity = cartFound.products[productIndex].quantity;
-        const quantityDiff = quantity - currentQuantity;
+        const oldQuantity = cartFound.products[productIndex].quantity;
+
+        const quantityDifference = quantity - oldQuantity;
+
+        if (product.stock < quantityDifference) {
+          throw new ErrorManager(
+            `No hay suficiente stock restante para esta operación. Stock restante: ${product.stock}`,
+            400
+          );
+        }
 
         cartFound.products[productIndex].quantity = quantity;
 
-        product.stock -= quantityDiff;
+        if (quantityDifference > 0) {
+          product.stock -= quantityDifference;
+        } else if (quantityDifference < 0) {
+          product.stock += Math.abs(quantityDifference);
+        }
+
         await productManager.updateOneById(pid, { stock: product.stock });
-
-        await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
-
-        return cartFound;
       } else {
         throw new ErrorManager(
           "No se encuentra este producto en el carrito...",
           404
         );
       }
+
+      await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
+      return cartFound;
     } catch (error) {
       throw new ErrorManager(error.message, error.code);
     }
@@ -149,7 +168,13 @@ export default class CartManager {
         cartFound.products.splice(productIndex, 1);
 
         const product = await productManager.getOneById(pid);
-        product.stock += quantityToReturn;
+
+        if (product.stock + quantityToReturn > product.initialStock) {
+          product.stock = product.initialStock;
+        } else {
+          product.stock += quantityToReturn;
+        }
+
         await productManager.updateOneById(pid, { stock: product.stock });
 
         await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);

@@ -15,7 +15,10 @@ export default class ProductManager {
     this.#products = await this.getAll();
 
     if (!this.#products) {
-      throw new ErrorManager("No se pudo cargar el archivo con los productos.", 500);
+      throw new ErrorManager(
+        "No se pudo cargar el archivo con los productos.",
+        500
+      );
     }
 
     const productFound = this.#products.find((item) => item.id === Number(id));
@@ -23,6 +26,7 @@ export default class ProductManager {
     if (!productFound) {
       throw new ErrorManager("Producto no encontrado...", 404);
     }
+
     return productFound;
   }
 
@@ -31,7 +35,10 @@ export default class ProductManager {
       this.#products = await readJsonFile(paths.files, this.#jsonFilename);
 
       if (!Array.isArray(this.#products)) {
-        throw new ErrorManager("El archivo de los productos está vacío...", 500);
+        throw new ErrorManager(
+          "El archivo de los productos está vacío...",
+          500
+        );
       }
 
       return this.#products;
@@ -47,6 +54,15 @@ export default class ProductManager {
     } catch (error) {
       throw new ErrorManager(error.message, error.code);
     }
+  }
+
+  async getByCategory(category) {
+    const categoryLower = category.toLowerCase();
+    const products = await this.getAll();
+
+    return products.filter(
+      (product) => product.category.toLowerCase() === categoryLower
+    );
   }
 
   async updateOneById(id, data) {

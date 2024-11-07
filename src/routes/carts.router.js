@@ -84,11 +84,9 @@ router.put("/:cid/product/:pid", async (req, res) => {
     const { quantity } = req.body;
 
     if (quantity <= 0) {
-      return res
-        .status(400)
-        .json({
-          error: "La cantidad a ingresar tiene que ser mayor que cero...",
-        });
+      return res.status(400).json({
+        error: "La cantidad a ingresar tiene que ser mayor que cero...",
+      });
     }
 
     const cart = await cartManager.updateProductQuantity(
