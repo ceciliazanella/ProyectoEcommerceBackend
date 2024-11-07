@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "title": "Torta Lemmon Pie",
+    "description": "Base de tarta crocante, rellena de crema mousse de limón. Cubierta con merengue italiano flambeado.",
+    "code": "TF001",
+    "price": 16500,
+    "status": true,
+    "stock": 0,
+    "category": "Frutales",
+    "thumbnails": ["./images/1_lemmon_pie.webp"]
+  },
+  {
+    "id": 2,
+    "title": "Cheese Cake Frutos Rojos",
+    "description": "Suave mousse de queso, saborizada con ralladura de limón y un toque de vainilla. Cubierta con salsa de frutos del bosque (Frambuesa, moras y arándanos).",
+    "code": "TF002",
+    "price": 26000,
+    "status": true,
+    "stock": 0,
+    "category": "Frutales",
+    "thumbnails": ["./images/2_cheesecake_frutosrojos.webp"]
+  },
+  {
+    "id": 3,
+    "title": "Crumble de Manzana",
+    "description": "Torta rellena con pure de manzana verde natural. Cubierta con un crocante de almendras y azúcar negra.",
+    "code": "TF003",
+    "price": 16500,
+    "status": true,
+    "stock": 5,
+    "category": "Frutales",
+    "thumbnails": ["./images/3_crumble_manzana.webp"]
+  },
+  {
+    "id": 4,
+    "title": "Chocotorta",
+    "description": "Un postre simple hecho a base de galletas dulces sabor cacao. Relleno con el mejor dulce de leche repostero mezclado con crema de leche y queso blanco.",
+    "code": "P001",
+    "price": 25000,
+    "status": true,
+    "stock": 10,
+    "category": "Postres",
+    "thumbnails": ["./images/4_chocotorta.webp"]
+  },
+  {
+    "id": 5,
+    "title": "Tarta Frutal",
+    "description": "Base de tarta crocante rellena con crema chantilly y las mejores frutillas naturales. Cobertura fresca y suave, realizada a base de gelatina de frutillas.",
+    "code": "TF004",
+    "price": 16500,
+    "status": true,
+    "stock": 20,
+    "category": "Frutales",
+    "thumbnails": ["./images/5_tarta_frutal.webp"]
+  },
+  {
+    "id": 6,
+    "title": "Postre Balcarse",
+    "description": "Riquísimo postre marplatense compuesto por múltiples capas de bizcochuelo. Relleno con crema chantilly, marrón glasé, nueces, castañas, dulce de leche y merengue.",
+    "code": "P002",
+    "price": 25000,
+    "status": true,
+    "stock": 5,
+    "category": "Postres",
+    "thumbnails": ["./images/6_postre_balcarse.webp"]
+  },
+  {
+    "id": 7,
+    "title": "Torta Brownie Clásica",
+    "description": "Pastel de chocolate denso y húmedo; super crujiente en su parte superior. Realizado con chocolate semiamargo, nueces, merengue italiano y el detalle de los frutos rojos.",
+    "code": "T001",
+    "price": 20000,
+    "status": true,
+    "stock": 0,
+    "category": "Tortas",
+    "thumbnails": ["./images/7_torta_brownie.webp"]
+  },
+  {
+    "id": 8,
+    "title": "Torta Selva Negra",
+    "description": "Torta compuesta por un exquisito bizcocho de chocolate amargo; relleno de crema batida y cerezas. Ideal para los amantes de los sabores intensos y el contraste de las texturas.",
+    "code": "T002",
+    "price": 30000,
+    "status": true,
+    "stock": 10,
+    "category": "Tortas",
+    "thumbnails": ["./images/8_selva_negra.webp"]
+  },
+  {
+    "id": 9,
+    "title": "Torta Doble Oreo",
+    "description": "La combinación perfecta entre una excelente mousse de chocolate, el clásico dulce de leche y la infaltable crema chantilly. Mezclada con galletas oreo y el mejor chocolate amargo picado.",
+    "code": "T003",
+    "price": 16500,
+    "status": true,
+    "stock": 0,
+    "category": "Tortas",
+    "thumbnails": ["./images/9_torta_doble_oreo.webp"]
+  },
+  {
+    "id": 10,
+    "title": "Torta Explosión Oreo",
+    "description": "Torta rellena con chocolate amargo, crema de leche y mantequilla de maní sobre una masa super tierna de sabor cítrico. Recubierta y decorada con crema chantilly; acompañada por los clásicos y dulces bon o bon.",
+    "code": "T004",
+    "price": 26000,
+    "status": true,
+    "stock": 20,
+    "category": "Tortas",
+    "thumbnails": ["./images/10_torta_explosion_oreo.webp"]
+  }
+]
