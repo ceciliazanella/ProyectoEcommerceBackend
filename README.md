@@ -15,11 +15,3 @@ Backend de ejemplo para un sistema de gestión de productos y carritos de compra
 - **File System (JSON)**: Los datos se almacenan en archivos JSON, simulando una base de datos sencilla.
 - **Manejo de errores:** Se utiliza un manejador de errores personalizado para la gestión de errores en las rutas.
 
-## Instalación
-
-1. **Clonar el repositorio:**
-
-   ```bash
-   git clone https://github.com/tu-usuario/corazon-de-chocolate.git
-   cd corazon-de-chocolate
-
