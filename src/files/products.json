@@ -58,7 +58,7 @@
 		"code": "TF004",
 		"price": 16500,
 		"status": true,
-		"stock": 20,
+		"stock": 0,
 		"category": "Frutales",
 		"thumbnails": [
 			"./images/5_tarta_frutal.webp"
@@ -71,7 +71,7 @@
 		"code": "P002",
 		"price": 25000,
 		"status": true,
-		"stock": 4,
+		"stock": 0,
 		"category": "Postres",
 		"thumbnails": [
 			"./images/6_postre_balcarse.webp"
@@ -150,9 +150,5 @@
 		"status": true,
 		"category": "Prueba",
 		"timestamp": "2024-11-07T03:21:02.654Z"
-	},
-	{
-		"id": 13,
-		"timestamp": "2024-11-07T04:10:43.737Z"
 	}
 ]
