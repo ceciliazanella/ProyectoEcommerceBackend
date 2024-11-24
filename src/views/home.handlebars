@@ -1,0 +1,54 @@
+<header>
+  <div class="title">
+    <h2>La Chocotienda <h3>de Corazón de Chocolate</h3>
+    </h2>
+  </div>
+</header>
+
+<main>
+  <section>
+    <h3>Menú de Tortas Artesanales</h3>
+    <div class="products">
+      <div class="products__list">
+        <ul class="products__list__item" id="products-list"></ul>
+      </div>
+      <button id="btn-refresh-products-list">Recargar Lista de Productos</button>
+    </div>
+
+    <section id="addProductForm">
+      <h3>Agregar Producto</h3>
+      <form id="add-product-form" enctype="multipart/form-data">
+        <label for="new-category">Categoría</label>
+        <input type="text" id="new-category" required />
+
+        <label for="new-code">Código del Producto</label>
+        <input type="text" id="new-code" required />
+
+        <label for="new-title">Nombre</label>
+        <input type="text" id="new-title" required />
+
+        <label for="new-thumbnails">La imagen es opcional...</label>
+        <input type="file" id="new-thumbnails" alt="Imagen" accept="image/*" />
+
+        <label for="new-description">Descripción</label>
+        <textarea id="new-description" required></textarea>
+
+        <label for="new-price">Precio</label>
+        <input type="number" id="new-price" required />
+
+        <label for="new-stock">Stock</label>
+        <input type="number" id="new-stock" required />
+
+        <label for="new-status">Estado</label>
+        <select id="new-status" required>
+          <option value="true" selected>Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+        <button type="submit">Agregar Producto</button>
+      </form>
+    </section>
+  </section>
+  <div id="message-container"></div>
+</main>
+
+<script src="/api/public/js/products.js"></script>

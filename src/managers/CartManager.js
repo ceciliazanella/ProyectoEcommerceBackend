@@ -18,7 +18,7 @@ export default class CartManager {
     this.#carts = await this.getAll();
     const cartFound = this.#carts.find((item) => item.id === Number(id));
     if (!cartFound) {
-      throw new ErrorManager("Carrito no encontrado...", 404);
+      throw new ErrorManager("Este carrito no fue encontrado...", 404);
     }
     return cartFound;
   }
@@ -65,14 +65,14 @@ export default class CartManager {
 
       if (product.initialStock < quantity) {
         throw new ErrorManager(
-          `No hay stock suficiente. Stock disponible: ${product.initialStock}`,
+          `No hay stock suficiente de este producto... Stock disponible: ${product.initialStock}`,
           400
         );
       }
 
       if (product.stock < quantity) {
         throw new ErrorManager(
-          `No hay suficiente stock restante. Stock disponible: ${product.stock}`,
+          `No queda stock de este producto... Stock disponible: ${product.stock}`,
           400
         );
       }
@@ -111,7 +111,7 @@ export default class CartManager {
 
       if (quantity > product.initialStock) {
         throw new ErrorManager(
-          `No hay suficiente stock disponible. Stock inicial: ${product.initialStock}`,
+          `No hay suficiente stock de este producto... Stock inicial: ${product.initialStock}`,
           400
         );
       }
@@ -127,7 +127,7 @@ export default class CartManager {
 
         if (product.stock < quantityDifference) {
           throw new ErrorManager(
-            `No hay suficiente stock restante para esta operación. Stock restante: ${product.stock}`,
+            `No hay suficiente stock para realizar esta operación... Stock restante: ${product.stock}`,
             400
           );
         }
@@ -143,7 +143,7 @@ export default class CartManager {
         await productManager.updateOneById(pid, { stock: product.stock });
       } else {
         throw new ErrorManager(
-          "No se encuentra este producto en el carrito...",
+          "Este producto no se encuentra en el carrito...",
           404
         );
       }

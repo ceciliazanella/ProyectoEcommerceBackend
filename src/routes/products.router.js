@@ -1,126 +1,89 @@
-import { Router } from "express";
-import ProductManager from "../managers/productManager.js";
+import express from "express";
+import ProductManager from "../managers/ProductManager.js";
+import multer from "multer";
+import path from "path";
 
-const router = Router();
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(process.cwd(), "public", "images"));
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({ storage });
+
+const router = express.Router();
 const productManager = new ProductManager();
 
 router.get("/", async (req, res) => {
   try {
     const products = await productManager.getAll();
-
-    if (products.length === 0) {
-      return res.status(404).json({
-        error: "No se encontraron productos.",
-      });
-    }
-
     res.status(200).json(products);
   } catch (error) {
-    console.error(error);
-    res.status(error.code || 500).json({ error: error.message });
+    res.status(error.code || 500).json({ message: error.message });
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const product = await productManager.getOneById(req.params.id);
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(error.code || 500).json({ message: error.message });
   }
 });
 
 router.get("/category/:category", async (req, res) => {
   try {
-    const { category } = req.params;
-    const categoryLower = category.toLowerCase();
+    const products = await productManager.getByCategory(req.params.category);
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(error.code || 500).json({ message: error.message });
+  }
+});
 
-    const products = await productManager.getAll();
-
-    const filteredProducts = products.filter((product) => {
-      return (
-        product.category && product.category.toLowerCase() === categoryLower
+router.post("/", upload.single("thumbnail"), async (req, res) => {
+  try {
+    const newProduct = await productManager.insertOne(req.body, req.file);
+    res.status(201).json(newProduct);
+  } catch (error) {
+    if (req.file) {
+      await deleteFile(
+        path.join(process.cwd(), "public", "images"),
+        req.file.filename
       );
-    });
-
-    if (filteredProducts.length === 0) {
-      return res.status(404).json({
-        error: "No se encontraron productos en esta categoría...",
-      });
     }
-
-    res.status(200).json(filteredProducts);
-  } catch (error) {
-    console.error(error);
-    res.status(error.code || 500).json({ error: error.message });
+    res.status(error.code || 500).json({ message: error.message });
   }
 });
 
-router.get("/:pid", async (req, res) => {
+router.put("/:id", upload.single("thumbnail"), async (req, res) => {
   try {
-    const { pid } = req.params;
-
-    if (isNaN(pid)) {
-      return res.status(400).json({
-        error:
-          "El parámetro 'pid' debe ser un número válido (ID del producto).",
-      });
-    }
-
-    const product = await productManager.getOneById(pid);
-    res.status(200).json(product);
+    const updatedProduct = await productManager.updateOneById(
+      req.params.id,
+      req.body,
+      req.file
+    );
+    res.status(200).json(updatedProduct);
   } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
+    if (req.file) {
+      await deleteFile(
+        path.join(process.cwd(), "public", "images"),
+        req.file.filename
+      );
+    }
+    res.status(error.code || 500).json({ message: error.message });
   }
 });
 
-router.post("/", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
-    const newProduct = req.body;
-
-    if (
-      !newProduct.title ||
-      !newProduct.description ||
-      !newProduct.price ||
-      !newProduct.category
-    ) {
-      return res.status(400).json({
-        error: "Todos los campos son obligatorios excepto thumbnails.",
-      });
-    }
-
-    const product = await productManager.insertOne(newProduct);
-    res.status(201).json(product);
+    await productManager.deleteOneById(req.params.id);
+    res.status(200).json({ message: "Eliminaste éxitosamente este producto!" });
   } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
-  }
-});
-
-router.put("/:pid", async (req, res) => {
-  try {
-    const { pid } = req.params;
-
-    if (isNaN(pid)) {
-      return res.status(400).json({
-        error:
-          "El parámetro 'pid' debe ser un número válido (ID del producto).",
-      });
-    }
-
-    const updatedData = req.body;
-    const product = await productManager.updateOneById(pid, updatedData);
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
-  }
-});
-
-router.delete("/:pid", async (req, res) => {
-  try {
-    const { pid } = req.params;
-
-    if (isNaN(pid)) {
-      return res.status(400).json({
-        error:
-          "El parámetro 'pid' debe ser un número válido (ID del producto).",
-      });
-    }
-
-    const result = await productManager.deleteOneById(pid);
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
+    res.status(error.code || 500).json({ message: error.message });
   }
 });
 

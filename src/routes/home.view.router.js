@@ -1,0 +1,21 @@
+import { Router } from "express";
+
+const router = Router();
+
+router.get("/", async (req, res) => {
+  try {
+    res.render("home", { title: "Home" });
+  } catch (error) {
+    res.status(500).send(`<h1>Error</h1><h3>${error.message}</h3>`);
+  }
+});
+
+router.get("/realTimeProducts", async (req, res) => {
+  try {
+    res.render("realTimeProducts", { title: "Productos en Tiempo Real" });
+  } catch (error) {
+    res.status(500).send(`<h1>Error</h1><h3>${error.message}</h3>`);
+  }
+});
+
+export default router;

@@ -19,7 +19,7 @@
 		"code": "TF002",
 		"price": 26000,
 		"status": true,
-		"stock": 0,
+		"stock": 20,
 		"category": "Frutales",
 		"thumbnails": [
 			"./images/2_cheesecake_frutosrojos.webp"
@@ -58,7 +58,7 @@
 		"code": "TF004",
 		"price": 16500,
 		"status": true,
-		"stock": 0,
+		"stock": 20,
 		"category": "Frutales",
 		"thumbnails": [
 			"./images/5_tarta_frutal.webp"
@@ -71,7 +71,7 @@
 		"code": "P002",
 		"price": 25000,
 		"status": true,
-		"stock": 0,
+		"stock": 15,
 		"category": "Postres",
 		"thumbnails": [
 			"./images/6_postre_balcarse.webp"
@@ -97,7 +97,7 @@
 		"code": "T002",
 		"price": 30000,
 		"status": true,
-		"stock": 2,
+		"stock": 22,
 		"category": "Tortas",
 		"thumbnails": [
 			"./images/8_selva_negra.webp"
@@ -110,7 +110,7 @@
 		"code": "T003",
 		"price": 16500,
 		"status": true,
-		"stock": 0,
+		"stock": 11,
 		"category": "Tortas",
 		"thumbnails": [
 			"./images/9_torta_doble_oreo.webp"
@@ -130,25 +130,87 @@
 		]
 	},
 	{
-		"id": 11,
-		"title": "Torta Agregada de Prueba",
-		"description": "x",
-		"price": 1220,
-		"stock": 1,
-		"code": "x",
-		"status": true,
+		"id": 17,
+		"title": "Prueba Agregada",
+		"price": 11000,
+		"stock": 22,
 		"category": "Prueba",
-		"timestamp": "2024-11-07T03:20:44.614Z"
+		"status": true,
+		"thumbnail": null,
+		"description": "Agregando Prueba...",
+		"code": "P0001",
+		"timestamp": "2024-11-23T03:33:18.638Z"
 	},
 	{
-		"id": 12,
-		"title": "Torta Modificada de Prueba",
-		"description": "x",
-		"price": 1220,
-		"stock": 1,
-		"code": "x",
-		"status": true,
+		"id": 18,
+		"title": "Prueba para Modiiificar",
+		"price": 22000,
+		"stock": 22,
 		"category": "Prueba",
-		"timestamp": "2024-11-07T03:21:02.654Z"
+		"status": true,
+		"thumbnail": null,
+		"description": "Prueba para modificar... ",
+		"code": "P0002",
+		"timestamp": "2024-11-23T03:47:39.902Z"
+	},
+	{
+		"id": 19,
+		"title": "Probar Nueva",
+		"price": 11000,
+		"stock": 9,
+		"category": "Prueba",
+		"status": true,
+		"thumbnail": null,
+		"description": "Nueva",
+		"code": "P0003",
+		"timestamp": "2024-11-23T03:50:01.987Z"
+	},
+	{
+		"id": 20,
+		"title": "Prueba",
+		"price": 25000,
+		"stock": 2,
+		"category": "Prueba",
+		"status": true,
+		"thumbnail": null,
+		"description": "Prueba Modificada",
+		"code": "P00022",
+		"timestamp": "2024-11-23T20:45:19.412Z"
+	},
+	{
+		"id": 21,
+		"title": "Torta Prueba Nueva Modificada",
+		"price": 16500,
+		"stock": 2,
+		"category": "Prueba",
+		"status": true,
+		"thumbnail": null,
+		"description": "Torta Prueba.",
+		"code": "TP001",
+		"timestamp": "2024-11-24T00:52:03.898Z"
+	},
+	{
+		"id": 22,
+		"title": "Nueva Prueba de Agregar y Modificar",
+		"price": 12000,
+		"stock": 2,
+		"category": "Prueba M",
+		"status": true,
+		"thumbnail": null,
+		"description": "Prueba subiendo... y modificando...",
+		"code": "TP11",
+		"timestamp": "2024-11-24T00:56:35.692Z"
+	},
+	{
+		"id": 23,
+		"title": "Agregar y Modificar Dina",
+		"price": 11000,
+		"stock": 22,
+		"category": "Agregando Dina y Modificando",
+		"status": true,
+		"thumbnail": null,
+		"description": "Agregando Torta Dinámicamente... y modificando!",
+		"code": "TD111",
+		"timestamp": "2024-11-24T00:58:39.537Z"
 	}
 ]
