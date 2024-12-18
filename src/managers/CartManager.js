@@ -1,41 +1,40 @@
-import paths from "../utils/paths.js";
-import { readJsonFile, writeJsonFile } from "../utils/fileHandler.js";
-import { generateId } from "../utils/collectionHandler.js";
-import ProductManager from "./productManager.js";
 import ErrorManager from "./ErrorManager.js";
-
-const productManager = new ProductManager();
+import { isValidID } from "../config/mongoose.config.js";
+import CartModel from "../models/cart.model.js";
+import ProductModel from "../models/product.model.js";
+import mongoose from "mongoose";
 
 export default class CartManager {
-  #jsonFilename;
-  #carts;
+  #cartModel;
 
   constructor() {
-    this.#jsonFilename = "carts.json";
+    this.#cartModel = CartModel;
   }
 
   async #findOneById(id) {
-    this.#carts = await this.getAll();
-    const cartFound = this.#carts.find((item) => item.id === Number(id));
-    if (!cartFound) {
-      throw new ErrorManager("Este carrito no fue encontrado...", 404);
+    if (!isValidID(id)) {
+      throw new ErrorManager("El ID del Carrito es inválido...", 400);
     }
-    return cartFound;
+    const cart = await this.#cartModel
+      .findById(id)
+      .populate("products.product");
+    if (!cart) {
+      throw new ErrorManager("Mmm... Carrito no encontrado...", 404);
+    }
+    return cart;
   }
 
   async getAll() {
     try {
-      this.#carts = await readJsonFile(paths.files, this.#jsonFilename);
-      return this.#carts;
+      return await this.#cartModel.find().populate("products.product").lean();
     } catch (error) {
-      throw new ErrorManager(error.message, error.code);
+      throw new ErrorManager("Error al querer obtener los Carritos...", 500);
     }
   }
 
-  async getOneById(cid) {
+  async getOneById(id) {
     try {
-      const cartFound = await this.#findOneById(cid);
-      return cartFound;
+      return await this.#findOneById(id);
     } catch (error) {
       throw new ErrorManager(error.message, error.code);
     }
@@ -43,150 +42,197 @@ export default class CartManager {
 
   async insertOne() {
     try {
-      const cart = {
-        id: generateId(await this.getAll()),
-        products: [],
-      };
+      const newCart = new this.#cartModel();
+      return await newCart.save();
+    } catch (error) {
+      throw new ErrorManager("Error al querer crear un Nuevo Carrito...", 500);
+    }
+  }
 
-      this.#carts.push(cart);
-      await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
+  async addOneProduct(id, productId, quantity) {
+    try {
+      let cart = await this.#findOneById(id);
+      if (!cart) {
+        cart = await this.insertOne();
+      }
+      await this.#validateProductInCart(id, productId, quantity);
+
+      const product = await ProductModel.findById(productId);
+
+      let totalQuantity = quantity;
+
+      const stockInitial = product.stockInitial;
+
+      const productIndex = cart.products.findIndex(
+        (item) => item.product._id.toString() === productId
+      );
+      if (productIndex >= 0) {
+        totalQuantity += cart.products[productIndex].quantity;
+        if (totalQuantity > stockInitial) {
+          throw new ErrorManager("Sin Stock disponible...", 400);
+        }
+        cart.products[productIndex].quantity = totalQuantity;
+      } else {
+        if (totalQuantity > stockInitial) {
+          throw new ErrorManager("No hay suficiente Stock disponible...", 400);
+        }
+        cart.products.push({ product: productId, quantity: totalQuantity });
+      }
+      await cart.save();
       return cart;
     } catch (error) {
       throw new ErrorManager(error.message, error.code);
     }
   }
 
-  async addProductToCart(cid, pid, quantity = 1) {
+  async removeProduct(id, productId) {
     try {
-      const cartFound = await this.#findOneById(cid);
-      const product = await productManager.getOneById(pid);
+      const cart = await this.#findOneById(id);
 
-      pid = Number(pid);
-
-      if (product.initialStock < quantity) {
-        throw new ErrorManager(
-          `No hay stock suficiente de este producto... Stock disponible: ${product.initialStock}`,
-          400
-        );
-      }
-
-      if (product.stock < quantity) {
-        throw new ErrorManager(
-          `No queda stock de este producto... Stock disponible: ${product.stock}`,
-          400
-        );
-      }
-
-      const productIndex = cartFound.products.findIndex(
-        (item) => item.productId === pid
+      const productIndex = cart.products.findIndex(
+        (item) => item.product._id.toString() === productId
       );
-
-      if (productIndex >= 0) {
-        cartFound.products[productIndex].quantity += quantity;
-      } else {
-        cartFound.products.push({ productId: pid, quantity });
+      if (productIndex === -1) {
+        throw new ErrorManager(
+          "Este Producto no se encontró en el Carrito...",
+          404
+        );
       }
 
-      product.stock -= quantity;
-      await productManager.updateOneById(pid, { stock: product.stock });
+      const product = cart.products[productIndex];
 
-      await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
-      return cartFound;
+      cart.products.splice(productIndex, 1);
+      await ProductModel.findByIdAndUpdate(productId, {
+        $inc: { stock: product.quantity },
+      });
+      await cart.save();
+      return cart;
     } catch (error) {
       throw new ErrorManager(error.message, error.code);
     }
   }
 
-  async updateProductQuantity(cid, pid, quantity) {
+  async updateProductQuantity(cartId, productId, quantity) {
     try {
-      const cartFound = await this.#findOneById(cid);
-      const product = await productManager.getOneById(pid);
+      const cart = await this.#findOneById(cartId);
+      if (!cart) {
+        throw new ErrorManager("Carrito no encontrado...", 404);
+      }
+      const cartItem = cart.products.find(
+        (item) => item.product._id.toString() === productId
+      );
+      if (!cartItem) {
+        throw new ErrorManager(
+          "Este Producto no se encontró en el Carrito...",
+          404
+        );
+      }
+
+      const product = cartItem.product;
 
       if (quantity <= 0) {
         throw new ErrorManager(
-          "La cantidad a ingresar tiene que ser mayor que cero...",
+          "La Cantidad tiene que ser mayor a cero...",
           400
         );
       }
-
-      if (quantity > product.initialStock) {
+      if (quantity > product.stockInitial) {
         throw new ErrorManager(
-          `No hay suficiente stock de este producto... Stock inicial: ${product.initialStock}`,
+          `No podés agregar más de ${product.stockInitial} Unidades de este Producto!`,
           400
         );
       }
-
-      const productIndex = cartFound.products.findIndex(
-        (item) => item.productId === Number(pid)
-      );
-
-      if (productIndex >= 0) {
-        const oldQuantity = cartFound.products[productIndex].quantity;
-
-        const quantityDifference = quantity - oldQuantity;
-
-        if (product.stock < quantityDifference) {
-          throw new ErrorManager(
-            `No hay suficiente stock para realizar esta operación... Stock restante: ${product.stock}`,
-            400
-          );
-        }
-
-        cartFound.products[productIndex].quantity = quantity;
-
-        if (quantityDifference > 0) {
-          product.stock -= quantityDifference;
-        } else if (quantityDifference < 0) {
-          product.stock += Math.abs(quantityDifference);
-        }
-
-        await productManager.updateOneById(pid, { stock: product.stock });
-      } else {
-        throw new ErrorManager(
-          "Este producto no se encuentra en el carrito...",
-          404
-        );
-      }
-
-      await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
-      return cartFound;
+      cartItem.quantity = quantity;
+      cartItem.total = product.price * quantity;
+      await cart.save();
+      return {
+        status: "success",
+        message: "La Cantidad de este Producto fue actualizada correctamente!",
+        payload: cart,
+      };
     } catch (error) {
-      throw new ErrorManager(error.message, error.code);
+      throw error;
     }
   }
 
-  async removeProductFromCart(cid, pid) {
+  async getCartProducts(cartId, searchTerm = "") {
     try {
-      const cartFound = await this.#findOneById(cid);
-      const productIndex = cartFound.products.findIndex(
-        (item) => item.productId === Number(pid)
-      );
-
-      if (productIndex >= 0) {
-        const quantityToReturn = cartFound.products[productIndex].quantity;
-
-        cartFound.products.splice(productIndex, 1);
-
-        const product = await productManager.getOneById(pid);
-
-        if (product.stock + quantityToReturn > product.initialStock) {
-          product.stock = product.initialStock;
-        } else {
-          product.stock += quantityToReturn;
-        }
-
-        await productManager.updateOneById(pid, { stock: product.stock });
-
-        await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
-        return cartFound;
-      } else {
-        throw new ErrorManager(
-          "No se encontró este producto en el carrito...",
-          404
+      const cart = await this.#findOneById(cartId).populate("products.product");
+      if (!cart || !cart.products || cart.products.length === 0) {
+        return { products: [], total: 0 };
+      }
+      if (searchTerm) {
+        cart.products = cart.products.filter((item) =>
+          item.product.title.toLowerCase().includes(searchTerm)
         );
       }
+      cart.products.sort((a, b) =>
+        a.product.title.localeCompare(b.product.title)
+      );
+      return {
+        products: cart.products,
+        total: cart.products.reduce(
+          (acc, item) => acc + (item.product.price || 0) * item.quantity,
+          0
+        ),
+      };
     } catch (error) {
-      throw new ErrorManager(error.message, error.code);
+      throw new ErrorManager(
+        "Error al obtener los Productos del Carrito...",
+        500
+      );
+    }
+  }
+
+  async emptyCart(cid) {
+    try {
+      const cart = await this.getOneById(cid);
+      if (cart.products.length === 0) return cart;
+      await Promise.all(
+        cart.products.map(async (item) => {
+          const product = await ProductModel.findById(item.product._id);
+          if (product) {
+            await ProductModel.findByIdAndUpdate(item.product._id, {
+              $inc: { stock: item.quantity },
+            });
+          }
+        })
+      );
+      cart.products = [];
+      cart.total = 0;
+      await cart.save();
+      return cart;
+    } catch (error) {
+      throw new ErrorManager(
+        "Hubo un Error al querer Vaciar el Carrito...: " + error.message,
+        500
+      );
+    }
+  }
+
+  async #validateProductInCart(cartId, productId, quantity) {
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      throw new ErrorManager("El ID de este Producto es inválido...", 400);
+    }
+
+    const cart = await this.#findOneById(cartId);
+
+    const product = await ProductModel.findById(productId);
+    if (!product) {
+      throw new ErrorManager("Producto no encontrado...", 404);
+    }
+
+    const existingProduct = cart.products.find(
+      (item) => item.product._id.toString() === productId
+    );
+
+    const stockInitial = product.stockInitial;
+
+    const totalQuantity = existingProduct
+      ? existingProduct.quantity + quantity
+      : quantity;
+    if (totalQuantity > stockInitial) {
+      throw new ErrorManager("No hay suficiente Stock disponible...", 400);
     }
   }
 }

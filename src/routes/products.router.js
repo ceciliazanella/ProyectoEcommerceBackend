@@ -1,89 +1,101 @@
-import express from "express";
+import { Router } from "express";
+import uploader from "../config/multer.config.js";
 import ProductManager from "../managers/ProductManager.js";
-import multer from "multer";
-import path from "path";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(process.cwd(), "public", "images"));
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
+const router = Router();
 
-const upload = multer({ storage });
-
-const router = express.Router();
 const productManager = new ProductManager();
 
 router.get("/", async (req, res) => {
   try {
-    const products = await productManager.getAll();
-    res.status(200).json(products);
+    const stock = req.query.stock !== undefined ? req.query.stock : "all";
+
+    if (stock !== "1" && stock !== "all") {
+      return res.status(400).json({
+        status: "error",
+        message:
+          'El Valor del Stock debe ser "1" para Productos Disponibles o "all" para todos los Productos...',
+      });
+    }
+
+    const products = await productManager.getAll(req.query);
+
+    res.status(200).json({ status: "success", payload: products });
   } catch (error) {
-    res.status(error.code || 500).json({ message: error.message });
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
+  }
+});
+
+router.get("/categories", async (req, res) => {
+  try {
+    const categories = await productManager.getCategories();
+
+    res.status(200).json({ status: "success", categories });
+  } catch (error) {
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 
 router.get("/:id", async (req, res) => {
   try {
     const product = await productManager.getOneById(req.params.id);
-    res.status(200).json(product);
+
+    res.status(200).json({ status: "success", payload: product });
   } catch (error) {
-    res.status(error.code || 500).json({ message: error.message });
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 
-router.get("/category/:category", async (req, res) => {
+router.post("/", uploader.single("thumbnails"), async (req, res) => {
   try {
-    const products = await productManager.getByCategory(req.params.category);
-    res.status(200).json(products);
+    const productData = req.body;
+
+    const imageFile = req.file;
+
+    const product = await productManager.insertOne(productData, imageFile);
+
+    res.status(201).json({ status: "success", product });
   } catch (error) {
-    res.status(error.code || 500).json({ message: error.message });
+    res
+      .status(error.status || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 
-router.post("/", upload.single("thumbnail"), async (req, res) => {
+router.put("/:id", uploader.single("thumbnails"), async (req, res) => {
   try {
-    const newProduct = await productManager.insertOne(req.body, req.file);
-    res.status(201).json(newProduct);
-  } catch (error) {
-    if (req.file) {
-      await deleteFile(
-        path.join(process.cwd(), "public", "images"),
-        req.file.filename
-      );
-    }
-    res.status(error.code || 500).json({ message: error.message });
-  }
-});
+    const productData = req.body;
 
-router.put("/:id", upload.single("thumbnail"), async (req, res) => {
-  try {
-    const updatedProduct = await productManager.updateOneById(
+    const imageFile = req.file;
+
+    const product = await productManager.updateOneById(
       req.params.id,
-      req.body,
-      req.file
+      productData,
+      imageFile
     );
-    res.status(200).json(updatedProduct);
+    res.status(200).json({ status: "success", payload: product });
   } catch (error) {
-    if (req.file) {
-      await deleteFile(
-        path.join(process.cwd(), "public", "images"),
-        req.file.filename
-      );
-    }
-    res.status(error.code || 500).json({ message: error.message });
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 
 router.delete("/:id", async (req, res) => {
   try {
-    await productManager.deleteOneById(req.params.id);
-    res.status(200).json({ message: "Eliminaste éxitosamente este producto!" });
+    const product = await productManager.deleteOneById(req.params.id);
+
+    res.status(200).json({ status: "success", payload: product });
   } catch (error) {
-    res.status(error.code || 500).json({ message: error.message });
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 

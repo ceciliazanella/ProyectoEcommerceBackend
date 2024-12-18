@@ -1,116 +1,140 @@
 import { Router } from "express";
-import CartManager from "../managers/cartManager.js";
+import CartManager from "../managers/CartManager.js";
 
 const router = Router();
+
 const cartManager = new CartManager();
 
 router.get("/", async (req, res) => {
   try {
     const carts = await cartManager.getAll();
-    res.status(200).json(carts);
+
+    res.status(200).json({ status: "success", payload: carts });
   } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 
 router.get("/:cid", async (req, res) => {
   try {
-    const { cid } = req.params;
-    const cart = await cartManager.getOneById(Number(cid));
-    res.status(200).json(cart);
+    const cart = await cartManager.getOneById(req.params.cid);
+
+    res.status(200).json({ status: "success", payload: cart });
   } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 
 router.get("/:cid/products", async (req, res) => {
   try {
-    const { cid } = req.params;
-    const cart = await cartManager.getOneById(Number(cid));
-    res.status(200).json(cart.products);
+    const cartId = req.params.cid;
+
+    const searchTerm = req.query.search ? req.query.search.toLowerCase() : "";
+
+    const cart = await cartManager.getCartProducts(cartId, searchTerm);
+
+    res.status(200).json({ status: "success", payload: cart });
   } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
-  }
-});
-
-router.get("/:cid/product/:pid", async (req, res) => {
-  try {
-    const { cid, pid } = req.params;
-    const cart = await cartManager.getOneById(Number(cid));
-    const product = cart.products.find(
-      (item) => item.productId === Number(pid)
-    );
-
-    if (!product) {
-      return res
-        .status(404)
-        .json({ error: "Este producto no se encuentra en el carrito..." });
-    }
-
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 
 router.post("/", async (req, res) => {
   try {
     const cart = await cartManager.insertOne();
-    res.status(201).json(cart);
+    res.status(201).json({ status: "success", payload: cart });
   } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 
-router.post("/:cid/product/:pid", async (req, res) => {
+router.post("/:cid/products/:pid", async (req, res) => {
   try {
     const { cid, pid } = req.params;
+
     const quantity = req.body.quantity || 1;
 
-    const cart = await cartManager.addProductToCart(
-      Number(cid),
-      Number(pid),
-      quantity
-    );
-    res.status(200).json(cart);
+    if (quantity <= 0) {
+      return res
+        .status(400)
+        .json({
+          status: "error",
+          message: "La Cantidad debe ser mayor que 0...",
+        });
+    }
+
+    const cart = await cartManager.addOneProduct(cid, pid, quantity);
+
+    res.status(200).json({ status: "success", payload: cart });
   } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 
-router.put("/:cid/product/:pid", async (req, res) => {
+router.put("/:cid/products/:pid", async (req, res) => {
   try {
     const { cid, pid } = req.params;
+
     const { quantity } = req.body;
 
     if (quantity <= 0) {
-      return res.status(400).json({
-        error: "La cantidad a ingresar tiene que ser mayor que cero...",
-      });
+      return res
+        .status(400)
+        .json({
+          status: "error",
+          message: "La Cantidad debe ser mayor que 0...",
+        });
     }
 
-    const cart = await cartManager.updateProductQuantity(
-      Number(cid),
-      Number(pid),
-      quantity
-    );
-    res.status(200).json(cart);
+    const cart = await cartManager.updateProductQuantity(cid, pid, quantity);
+
+    res.status(200).json({ status: "success", payload: cart });
   } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 
-router.delete("/:cid/product/:pid", async (req, res) => {
+router.delete("/:cid", async (req, res) => {
+  try {
+    const { cid } = req.params;
+
+    const cart = await cartManager.emptyCart(cid);
+
+    res.status(200).json({
+      status: "success",
+      message: "Carrito Vaciado con Éxito.",
+      payload: cart,
+    });
+  } catch (error) {
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
+  }
+});
+
+router.delete("/:cid/products/:pid", async (req, res) => {
   try {
     const { cid, pid } = req.params;
 
-    const cart = await cartManager.removeProductFromCart(
-      Number(cid),
-      Number(pid)
-    );
-    res.status(200).json(cart);
+    const cart = await cartManager.removeProduct(cid, pid);
+
+    res.status(200).json({ status: "success", payload: cart });
   } catch (error) {
-    res.status(error.code || 500).json({ error: error.message });
+    res
+      .status(error.code || 500)
+      .json({ status: "error", message: error.message });
   }
 });
 

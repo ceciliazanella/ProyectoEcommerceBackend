@@ -1,171 +1,127 @@
-import paths from "../utils/paths.js";
-import {
-  readJsonFile,
-  writeJsonFile,
-  deleteFile,
-} from "../utils/fileHandler.js";
-import { generateId } from "../utils/collectionHandler.js";
-import { convertToBoolean } from "../utils/converter.js";
 import ErrorManager from "./ErrorManager.js";
+import { isValidID } from "../config/mongoose.config.js";
+import ProductModel from "../models/product.model.js";
+import path from "path";
 
 export default class ProductManager {
-  #jsonFilename;
-  #products;
+  #productModel;
 
   constructor() {
-    this.#jsonFilename = "products.json";
+    this.#productModel = ProductModel;
   }
 
   async #findOneById(id) {
-    this.#products = await this.getAll();
-    const productFound = this.#products.find((item) => item.id === Number(id));
-
-    if (!productFound) {
-      throw new ErrorManager("No se encontró este producto...", 404);
+    if (!isValidID(id)) {
+      throw new ErrorManager("ID inválido", 400);
     }
 
-    return productFound;
-  }
-
-  async getAll() {
-    try {
-      this.#products = await readJsonFile(paths.files, this.#jsonFilename);
-      return this.#products;
-    } catch (error) {
-      throw new ErrorManager(error.message, error.code);
+    const product = await this.#productModel.findById(id);
+    if (!product) {
+      throw new ErrorManager("No se encontró el ID...", 404);
     }
+    return product;
   }
 
-  async getOneById(id) {
+  async getAll(params) {
     try {
-      const productFound = await this.#findOneById(id);
-      return productFound;
+      const $and = [];
+      if (params?.title) {
+        $and.push({ title: { $regex: params.title, $options: "i" } });
+      }
+      if (params?.category && params.category !== "all") {
+        $and.push({ category: params.category });
+      }
+      if (params?.stock === "1") {
+        $and.push({ stock: { $gte: 1 } });
+      }
+
+      const filters = $and.length > 0 ? { $and } : {};
+
+      const sort = {};
+      if (params?.sort === "price_asc") {
+        sort.price = 1;
+      } else if (params?.sort === "price_desc") {
+        sort.price = -1;
+      }
+
+      const paginationOptions = {
+        limit: 3,
+        page: parseInt(params?.page) || 1,
+        sort: sort,
+        lean: true,
+      };
+      return await this.#productModel.paginate(filters, paginationOptions);
     } catch (error) {
-      throw new ErrorManager(error.message, error.code);
-    }
-  }
-
-  async getByCategory(category) {
-    try {
-      if (category === "Todos los Productos") {
-        return await this.getAll();
-      }
-
-      if (!category) {
-        throw new ErrorManager("Categoría no fue especificada...", 400);
-      }
-
-      const categoryLower = category.toLowerCase();
-      const products = await this.getAll();
-      const filteredProducts = products.filter(
-        (product) => product.category.toLowerCase() === categoryLower
-      );
-
-      if (filteredProducts.length === 0) {
-        throw new ErrorManager("No hay productos para esta categoría...", 404);
-      }
-
-      return filteredProducts;
-    } catch (error) {
-      throw new ErrorManager(error.message, error.code);
+      throw new ErrorManager(error.message, 500);
     }
   }
 
   async getCategories() {
-    try {
-      const products = await this.getAll();
-      const categories = [
-        ...new Set(products.map((product) => product.category)),
-      ];
-      return categories;
-    } catch (error) {
-      throw new ErrorManager(error.message, error.code);
-    }
+    const categories = await this.#productModel.aggregate([
+      { $match: { category: { $exists: true, $ne: null, $ne: "" } } },
+      { $group: { _id: "$category" } },
+    ]);
+    return categories.map((item) => item._id);
   }
 
-  async insertOne(data, file) {
-    try {
-      const { title, price, stock, category, description, code } = data;
-
-      if (!title || !price || !stock || !category || !description || !code) {
-        throw new ErrorManager("Faltan agregar datos obligatorios...", 400);
-      }
-
-      const product = {
-        id: generateId(await this.getAll()),
-        title,
-        price: Number(price),
-        stock: Number(stock),
-        category,
-        description,
-        code,
-        status: true,
-        thumbnail: file?.filename ?? null,
-        timestamp: new Date(),
-      };
-
-      this.#products.push(product);
-      await writeJsonFile(paths.files, this.#jsonFilename, this.#products);
-
-      return product;
-    } catch (error) {
-      if (file?.filename) await deleteFile(paths.images, file.filename);
-      throw new ErrorManager(error.message, error.code);
-    }
+  async getOneById(id) {
+    return await this.#findOneById(id);
   }
 
-  async updateOneById(id, data, file) {
-    try {
-      const productFound = await this.#findOneById(id);
-      const newThumbnail = file?.filename ?? productFound.thumbnail;
+  async checkCodeExists(code) {
+    const existingProduct = await this.#productModel.findOne({ code });
+    return existingProduct !== null;
+  }
 
-      const updatedProduct = {
-        id: productFound.id,
-        title: data.title || productFound.title,
-        price: data.price ? Number(data.price) : productFound.price,
-        stock: data.stock ? Number(data.stock) : productFound.stock,
-        category: data.category || productFound.category,
-        status:
-          data.status !== undefined
-            ? convertToBoolean(data.status)
-            : productFound.status,
-        thumbnail: newThumbnail,
-        description: data.description || productFound.description,
-        code: data.code || productFound.code,
-        timestamp: productFound.timestamp,
-      };
-
-      const index = this.#products.findIndex((item) => item.id === Number(id));
-      if (index !== -1) {
-        this.#products[index] = updatedProduct;
-        await writeJsonFile(paths.files, this.#jsonFilename, this.#products);
-        return updatedProduct;
-      } else {
-        throw new ErrorManager("Este producto no fue encontrado...", 404);
-      }
-    } catch (error) {
-      throw new ErrorManager(error.message, error.code);
+  async insertOne(productData, imageFile) {
+    if (await this.checkCodeExists(productData.code)) {
+      throw new ErrorManager(
+        "Este Código ya está en uso! Ingresá uno nuevo, por favor...",
+        400
+      );
     }
+    if (imageFile) {
+      productData.thumbnails = path.join(
+        "uploads",
+        "products",
+        imageFile.filename
+      );
+    }
+
+    const product = new this.#productModel(productData);
+
+    await product.save();
+    return product;
+  }
+
+  async updateOneById(id, productData, imageFile) {
+    const product = await this.#findOneById(id);
+    if (productData.code && productData.code !== product.code) {
+      if (await this.checkCodeExists(productData.code)) {
+        throw new ErrorManager(
+          "Este Código ya está en uso! Ingresá uno nuevo, por favor!",
+          400
+        );
+      }
+    }
+    if (imageFile) {
+      productData.thumbnails = path.join(
+        "uploads",
+        "products",
+        imageFile.filename
+      );
+    }
+    Object.assign(product, productData);
+    await product.save();
+    return product;
   }
 
   async deleteOneById(id) {
-    try {
-      const productFound = await this.#findOneById(id);
-
-      if (productFound.thumbnail) {
-        await deleteFile(paths.images, productFound.thumbnail);
-      }
-
-      const index = this.#products.findIndex((item) => item.id === Number(id));
-      this.#products.splice(index, 1);
-      await writeJsonFile(paths.files, this.#jsonFilename, this.#products);
-
-      return {
-        status: "success",
-        message: "Este producto se eliminó exitosamente!",
-      };
-    } catch (error) {
-      throw new ErrorManager(error.message, error.code);
+    const product = await this.#findOneById(id);
+    if (!product) {
+      throw new ErrorManager("Producto no encontrado", 404);
     }
+    await product.constructor.deleteOne({ _id: id });
+    return product;
   }
 }

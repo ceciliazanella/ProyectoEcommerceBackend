@@ -1,7 +1,6 @@
 import multer from "multer";
-import paths from "./paths.js";
-
-import { generateNameForFile } from "./random.js";
+import paths from "../utils/paths.js";
+import { generateNameForFile } from "../utils/random.js";
 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
@@ -9,7 +8,6 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, callback) => {
     const filename = generateNameForFile(file.originalname);
-
     callback(null, filename);
   },
 });

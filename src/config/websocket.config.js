@@ -1,160 +1,134 @@
 import { Server } from "socket.io";
-import { generateId } from "../utils/collectionHandler.js";
 import ProductManager from "../managers/ProductManager.js";
+import CartManager from "../managers/CartManager.js";
 
 const productManager = new ProductManager();
 
+const cartManager = new CartManager();
+
 export const config = (httpServer) => {
   const socketServer = new Server(httpServer);
-
   socketServer.on("connection", async (socket) => {
-    console.log("La conexión está establecida!", socket.id);
+    console.log("Se estableció conexión...", socket.id);
 
-    socket.emit("filtered-products", {
-      products: await productManager.getAll(),
-    });
+    const calculateCartTotal = (products) => {
+      return products.reduce(
+        (acc, item) => acc + item.product.price * item.quantity,
+        0
+      );
+    };
 
-    socket.on("insert-product", async (productData) => {
+    const sendProductList = async (page = 1, limit = 10) => {
+      const products = await productManager.getAll({ page, limit });
+      socket.emit("products-list", {
+        products: products.docs,
+        totalPages: products.totalPages,
+        currentPage: page,
+      });
+    };
+    await sendProductList(1, 10);
+
+    const updateProductList = async () => {
+      socketServer.emit("products-list", {
+        products: await productManager.getAll(),
+      });
+    };
+
+    socket.on("insert-product", async (data) => {
       try {
-        const { title, price, stock, category, description, code, thumbnail } =
-          productData;
-
-        if (!title || !price || !stock || !category || !description || !code) {
-          throw new Error("Te faltan datos que son obligatorios...");
-        }
-
-        const product = {
-          id: generateId(await productManager.getAll()),
-          title,
-          price: Number(price),
-          stock: Number(stock),
-          category,
-          description,
-          code,
-          status: true,
-          thumbnail: thumbnail ? thumbnail : null,
-          timestamp: new Date(),
-        };
-
-        await productManager.insertOne(product);
-
-        socketServer.emit("filtered-products", {
-          products: await productManager.getAll(),
-        });
-
-        socket.emit("success-message", {
-          message: "Agregaste éxitosamente tu producto a la lista!",
-        });
+        await productManager.insertOne(data);
+        await updateProductList();
       } catch (error) {
-        console.error("Hubo un error al querer agregar tu producto:", error);
         socket.emit("error-message", { message: error.message });
       }
     });
 
     socket.on("delete-product", async (data) => {
       try {
-        const result = await productManager.deleteOneById(Number(data.id));
-        console.log("Eliminaste este producto...:", result);
-
-        socketServer.emit("filtered-products", {
-          products: await productManager.getAll(),
-        });
-
-        socket.emit("success-message", {
-          message: "Eliminaste tu producto con éxito!",
-        });
+        await productManager.deleteOneById(Number(data.id));
+        await updateProductList();
       } catch (error) {
-        console.error(
-          "Hubo un error al querer eliminar tu producto...:",
-          error
-        );
         socket.emit("error-message", { message: error.message });
       }
     });
 
-    socket.on("update-product", async (data, file) => {
+    socket.on("get-cart", async (cartId) => {
       try {
-        const { id, title, price, stock, category, description, code, status } =
-          data;
+        const cart = await cartManager.getOneById(cartId);
+        const cartData = {
+          cartId: cart._id,
+          products: cart.products,
+          total: calculateCartTotal(cart.products),
+        };
+        socket.emit("cart-updated", cartData);
+      } catch (error) {
+        socket.emit("error-message", { message: error.message });
+      }
+    });
 
-        const updatedProductData = {};
-        if (title) updatedProductData.title = title;
-        if (price) updatedProductData.price = price;
-        if (stock) updatedProductData.stock = stock;
-        if (category) updatedProductData.category = category;
-        if (description) updatedProductData.description = description;
-        if (code) updatedProductData.code = code;
-        if (status !== undefined) updatedProductData.status = status;
-
-        if (file) updatedProductData.thumbnail = file.filename;
-
-        const updatedProduct = await productManager.updateOneById(
-          id,
-          updatedProductData,
-          file
+    socket.on("add-product-to-cart", async (data) => {
+      try {
+        const { cartId, productId, quantity } = data;
+        const updatedCart = await cartManager.addOneProduct(
+          cartId,
+          productId,
+          quantity
         );
 
-        socketServer.emit("filtered-products", {
-          products: await productManager.getAll(),
-        });
-
-        socket.emit("success-message", {
-          message: "Actualizaste tu producto con éxito!",
-        });
-      } catch (error) {
-        console.error(
-          "Hubo un error al querer actualizar este producto...:",
-          error
-        );
-        socket.emit("error-message", { message: error.message });
-      }
-    });
-
-    socket.on("get-products-by-category", async (category) => {
-      try {
-        const filteredProducts = await productManager.getByCategory(category);
-        socket.emit("filtered-products", { products: filteredProducts });
+        const cartData = {
+          cartId: updatedCart._id,
+          products: updatedCart.products,
+          total: calculateCartTotal(updatedCart.products),
+        };
+        socketServer.emit("cart-updated", cartData);
       } catch (error) {
         socket.emit("error-message", { message: error.message });
       }
     });
 
-    socket.on("get-categories", async () => {
+    socket.on("remove-product-from-cart", async (data) => {
       try {
-        const categories = await productManager.getCategories();
-        socket.emit("categories-list", { categories });
+        const { cartId, productId } = data;
+        await cartManager.removeProduct(cartId, productId);
+        const updatedCart = await cartManager.getOneById(cartId);
+        const cartData = {
+          cartId: updatedCart._id,
+          products: updatedCart.products,
+          total: calculateCartTotal(updatedCart.products),
+        };
+        socketServer.emit("cart-updated", cartData);
       } catch (error) {
         socket.emit("error-message", { message: error.message });
       }
     });
 
-    socket.on("search-product-by-id", async (data) => {
+    socket.on("update-product-quantity", async (data) => {
       try {
-        const product = await productManager.getOneById(Number(data.id));
-
-        if (product) {
-          socket.emit("product-found", { product });
-        } else {
-          socket.emit("error-message", {
-            message: "Este producto no fue encontrado...",
-          });
-        }
+        const { cartId, productId, quantity } = data;
+        await cartManager.updateProductQuantity(cartId, productId, quantity);
+        const updatedCart = await cartManager.getOneById(cartId);
+        const cartData = {
+          cartId: updatedCart._id,
+          products: updatedCart.products,
+          total: calculateCartTotal(updatedCart.products),
+        };
+        socketServer.emit("cart-updated", cartData);
       } catch (error) {
         socket.emit("error-message", { message: error.message });
       }
     });
 
-    socket.on("get-all-products", async () => {
-      try {
-        const allProducts = await productManager.getAll();
-        socket.emit("filtered-products", { products: allProducts });
-      } catch (error) {
-        socket.emit("error-message", { message: error.message });
-      }
+    socket.on("get-products", async (data) => {
+      const { page, limit } = data;
+      await sendProductList(page || 1, limit || 10);
+    });
+
+    socket.on("error", (errorMessage) => {
+      socket.emit("error-message", { message: errorMessage });
     });
 
     socket.on("disconnect", () => {
-      console.log("El cliente se desconectó...");
+      console.log("El Cliente se desconectó...", socket.id);
     });
   });
 };

@@ -1,0 +1,86 @@
+<header>
+  <div class="title">
+    <h2>La Chocotienda <h3>de Corazón de Chocolate</h3>
+    </h2>
+  </div>
+</header>
+
+<main>
+  <section>
+    <h3>Menú de Tortas Artesanales</h3>
+
+    <div id="go-to-cart-button">
+      <button onclick="window.location.href='/cart'">Ir al Carrito</button>
+    </div>
+
+    <div class="products">
+      <div class="filters">
+
+        <label for="category">Categoría</label>
+        <select id="category">
+          <option value="all">Todas</option>
+        </select>
+
+        <label for="price">Ordenar por Precio</label>
+        <select id="price">
+          <option value="asc">Menor a Mayor</option>
+          <option value="desc">Mayor a Menor</option>
+        </select>
+
+        <label for="availability">Disponibilidad</label>
+        <select id="availability">
+          <option value="all">Todos</option>
+          <option value="available">Disponibles</option>
+        </select>
+
+        <label for="search">Buscar Producto</label>
+        <input type="text" id="search" placeholder="Buscar por nombre..." />
+      </div>
+
+      <div class="products__list">
+        <ul id="products-list"></ul>
+      </div>
+
+      <div id="pagination">
+        <button id="prev-page">Anterior</button>
+        <button id="next-page">Siguiente</button>
+      </div>
+    </div>
+
+    <section id="addProductForm">
+      <h3>Agregar Nuevo Producto</h3>
+      <form id="add-product-form" enctype="multipart/form-data">
+        <label for="new-category">Categoría</label>
+        <select id="new-category" required></select>
+
+        <label for="new-code">Código</label>
+        <input type="text" id="new-code" required />
+
+        <label for="new-title">Nombre</label>
+        <input type="text" id="new-title" required />
+
+        <label for="new-thumbnails">Imagen (Opcional)</label>
+        <input type="file" id="new-thumbnails" accept="image/*" />
+
+        <label for="new-description">Descripción</label>
+        <textarea id="new-description" required></textarea>
+
+        <label for="new-price">Precio</label>
+        <input type="number" id="new-price" required />
+
+        <label for="new-stock">Stock</label>
+        <input type="number" id="new-stock" required />
+
+        <label for="new-status">Estado</label>
+        <select id="new-status" required>
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+
+        <button type="submit">Agregar Producto</button>
+      </form>
+    </section>
+  </section>
+
+  <div id="error-container" style="color: red; font-weight: bold;"></div>
+</main>
