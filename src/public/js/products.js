@@ -54,7 +54,7 @@ async function loadProductsList(page = 1) {
 
     const params = {
       page,
-      category: category || "",
+      category: category === "Todas las Categorías" ? "" : category,
       sort:
         price === "asc" ? "price_asc" : price === "desc" ? "price_desc" : "",
       title: search,

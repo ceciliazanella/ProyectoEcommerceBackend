@@ -25,61 +25,50 @@ export default class ProductManager {
   async getAll(params) {
     try {
       const $and = [];
-  
-      // Filtro por título (si está presente)
+
       if (params?.title) {
         $and.push({ title: { $regex: params.title, $options: "i" } });
       }
-  
-      // Filtro por categoría (si no es "Todas las Categorías")
       if (params?.category && params.category !== "Todas las Categorías") {
         $and.push({ category: params.category });
       }
-  
-      // Filtro por stock (si es igual a "1")
       if (params?.stock === "1") {
         $and.push({ stock: { $gte: 1 } });
       }
-  
-      // Si hay filtros, creamos el objeto de filtros
+
       const filters = $and.length > 0 ? { $and } : {};
-  
-      // Filtro de ordenamiento por precio
+
       const sort = {};
       if (params?.sort === "price_asc") {
         sort.price = 1;
       } else if (params?.sort === "price_desc") {
         sort.price = -1;
       }
-  
-      // Opciones de paginación
+
       const paginationOptions = {
-        limit: 3,  // Puedes ajustar el número de productos por página según sea necesario
+        limit: 3,
         page: parseInt(params?.page) || 1,
         sort: sort,
-        lean: true,  // Optimizamos la consulta para solo traer los datos
+        lean: true,
       };
-  
-      // Consultar los productos con los filtros y opciones de paginación
-      const products = await this.#productModel.paginate(filters, paginationOptions);
-  
-      // Si el parámetro de categoría es "Todas las Categorías", puedes devolver solo las categorías distintas
+
+      const products = await this.#productModel.paginate(
+        filters,
+        paginationOptions
+      );
+
       if (params?.category === "Todas las Categorías") {
         const categories = await this.#productModel.distinct("category");
         return {
-          products: products.docs, // Lista de productos paginados
-          categories,              // Lista de todas las categorías distintas
+          products: products.docs,
+          categories,
         };
       }
-  
-      // Si no es el caso de "Todas las Categorías", solo devolvemos los productos
       return products;
-  
     } catch (error) {
       throw new ErrorManager(error.message, 500);
     }
   }
-
 
   async getCategories() {
     const categories = await this.#productModel.aggregate([
