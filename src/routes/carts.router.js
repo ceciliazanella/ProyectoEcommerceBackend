@@ -9,8 +9,10 @@ router.get("/", async (req, res) => {
   try {
     const carts = await cartManager.getAll();
 
+    console.log("Carritos Disponibles: ", carts);
     res.status(200).json({ status: "success", payload: carts });
   } catch (error) {
+    console.error("Error al querer Obtener todos los Carritos...:", error);
     res
       .status(error.code || 500)
       .json({ status: "error", message: error.message });
@@ -20,7 +22,12 @@ router.get("/", async (req, res) => {
 router.get("/:cid", async (req, res) => {
   try {
     const cart = await cartManager.getOneById(req.params.cid);
-
+    if (!cart) {
+      return res.status(404).json({
+        status: "error",
+        message: "No se encontró un Carrito espécifico...",
+      });
+    }
     res.status(200).json({ status: "success", payload: cart });
   } catch (error) {
     res
@@ -48,6 +55,7 @@ router.get("/:cid/products", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const cart = await cartManager.insertOne();
+
     res.status(201).json({ status: "success", payload: cart });
   } catch (error) {
     res
@@ -61,14 +69,11 @@ router.post("/:cid/products/:pid", async (req, res) => {
     const { cid, pid } = req.params;
 
     const quantity = req.body.quantity || 1;
-
     if (quantity <= 0) {
-      return res
-        .status(400)
-        .json({
-          status: "error",
-          message: "La Cantidad debe ser mayor que 0...",
-        });
+      return res.status(400).json({
+        status: "error",
+        message: "La Cantidad debe ser mayor que 0...",
+      });
     }
 
     const cart = await cartManager.addOneProduct(cid, pid, quantity);
@@ -86,14 +91,11 @@ router.put("/:cid/products/:pid", async (req, res) => {
     const { cid, pid } = req.params;
 
     const { quantity } = req.body;
-
     if (quantity <= 0) {
-      return res
-        .status(400)
-        .json({
-          status: "error",
-          message: "La Cantidad debe ser mayor que 0...",
-        });
+      return res.status(400).json({
+        status: "error",
+        message: "La Cantidad debe ser mayor que 0...",
+      });
     }
 
     const cart = await cartManager.updateProductQuantity(cid, pid, quantity);

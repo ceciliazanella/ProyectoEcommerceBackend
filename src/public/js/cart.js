@@ -4,15 +4,13 @@ let searchQuery = "";
 
 async function getOrCreateCart() {
   if (typeof Storage === "undefined") {
-    showNotification("El almacenamiento Local no está disponible...", "error");
-
+    showNotification("El Almacenamiento Local no está disponible...", "error");
     return null;
   }
 
   let cartId = localStorage.getItem("cartId");
-
   if (!cartId) {
-    cartId = await createNewCart();
+    return null;
   }
   return cartId;
 }
@@ -41,13 +39,11 @@ async function createNewCart() {
 async function loadCart(search = "") {
   try {
     const cartId = await getOrCreateCart();
-
     if (!cartId) return;
 
     const response = await fetch(`/api/carts/${cartId}`);
 
     const data = await response.json();
-
     if (
       data.status === "success" &&
       data.payload &&
@@ -112,6 +108,7 @@ function updateCartView(products) {
       const { _id: productId, price, stockInitial, title } = item.product;
 
       const { quantity } = item;
+
       cartContainer.innerHTML += `
         <div class="cart-item" data-product-id="${productId}">
           <p>${title}</p>
@@ -153,7 +150,6 @@ function addEventListenersToButtons() {
 async function updateQuantity(productId) {
   try {
     const cartId = await getOrCreateCart();
-
     if (!cartId) return;
 
     const response = await fetch(`/api/carts/${cartId}`);
@@ -226,7 +222,6 @@ async function updateQuantity(productId) {
 async function updateCart(action, productId) {
   try {
     const cartId = await getOrCreateCart();
-
     if (!cartId) return;
 
     const method = action === "remove" ? "DELETE" : "POST";
@@ -236,6 +231,7 @@ async function updateCart(action, productId) {
     });
 
     const data = await response.json();
+
     if (data.status === "success") {
       loadCart(searchQuery);
     } else {
@@ -255,15 +251,16 @@ async function updateCart(action, productId) {
 async function addToCart(productId) {
   try {
     const cartId = await getOrCreateCart();
-    if (!cartId) return;
+    if (!cartId) {
+      window.location.href = "/login";
+      return;
+    }
 
     const productResponse = await fetch(`/api/products/${productId}`);
 
     const productData = await productResponse.json();
-
     if (productData.status !== "success" || !productData.payload) {
       showNotification("No se encontró este Producto...", "error");
-
       return;
     }
 
@@ -274,15 +271,12 @@ async function addToCart(productId) {
         "Este Producto no cuenta con Stock suficiente...",
         "error"
       );
-
       return;
     }
 
     const cartResponse = await fetch(`/api/carts/${cartId}`);
-
     if (cartResponse.status === 404) {
       showNotification("Carrito no encontrado...", "error");
-
       return;
     }
 
@@ -293,17 +287,16 @@ async function addToCart(productId) {
     const existingProductIndex = cart.products.findIndex(
       (p) => p.product._id === productId
     );
+
     if (existingProductIndex !== -1) {
       const existingProduct = cart.products[existingProductIndex];
 
       const newQuantity = existingProduct.quantity + 1;
-
       if (newQuantity > product.stockInitial) {
         showNotification(
           `No podés agregar más de ${product.stockInitial} Unidades de este Producto! Sólo quedan ${product.stockInitial} Unidades...`,
           "error"
         );
-
         return;
       }
       await fetch(`/api/carts/${cartId}/products/${productId}`, {
@@ -335,27 +328,54 @@ async function addToCart(productId) {
 async function emptyCart() {
   try {
     const cartId = await getOrCreateCart();
-
     if (!cartId) return;
 
     const response = await fetch(`/api/carts/${cartId}`, { method: "DELETE" });
-
     if (response.ok) {
-      localStorage.removeItem("cartId");
-
-      showNotification("Se Vació tu Carrito!", "success");
+      showNotification("Se vació tu Carrito de Productos!", "success");
 
       showEmptyCartMessage();
 
       loadCart();
     } else {
       showNotification(
-        "Hubo un problema al querer Vaciar tu Carrito...",
+        "Hubo un problema al intentar Vaciar los Productos de tu Carrito.",
         "error"
       );
     }
   } catch (error) {
-    showNotification("Hubo un problema al querer Vaciar tu Carrito.", "error");
+    showNotification(
+      "Hubo un problema al querer Vaciar los Productos del Carrito.",
+      "error"
+    );
+  }
+}
+
+async function removeFromCart(productId) {
+  try {
+    const cartId = await getOrCreateCart();
+    if (!cartId) return;
+
+    const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+      method: "DELETE",
+    });
+
+    const data = await response.json();
+    if (data.status === "success") {
+      showNotification("Producto Eliminado con Éxito!", "success");
+
+      loadCart(searchQuery);
+    } else {
+      showNotification(
+        "Hubo un problema al querer Eliminar el Producto...",
+        "error"
+      );
+    }
+  } catch (error) {
+    showNotification(
+      "Hubo un problema al intentar Eliminar el Producto...",
+      "error"
+    );
   }
 }
 
@@ -370,7 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("empty-cart-btn").addEventListener("click", () => {
-    if (confirm("¿Estás seguro de que querés Vaciar tu Carrito?")) {
+    if (confirm("¿Estás seguro que querés Vaciar tu Carrito?")) {
       emptyCart();
     }
   });

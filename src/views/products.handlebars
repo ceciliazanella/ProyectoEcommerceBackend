@@ -1,11 +1,14 @@
 <header>
+
   <div class="title">
     <h2>La Chocotienda<h3>de Corazón de Chocolate</h3>
     </h2>
   </div>
+
 </header>
 
 <main>
+
   <section>
     <h3>Menú de Tortas Artesanales</h3>
 
@@ -21,6 +24,8 @@
           <option value="Todas las Categorías">Todas las Categorías</option>
         </select>
 
+        <img src="{{product.imageUrl}}" alt="Product Image" />
+
         <label for="price">Ordenar por Precio</label>
         <select id="price">
           <option value="asc">Menor a Mayor</option>
@@ -34,7 +39,7 @@
         </select>
 
         <label for="search">Buscar Producto</label>
-        <input type="text" id="search" placeholder="Buscar por nombre..." />
+        <input type="text" id="search" placeholder="Buscá tu Producto por su Nombre..." />
       </div>
 
       <div class="products__list">
@@ -48,7 +53,7 @@
     </div>
 
     <section id="addProductForm">
-      <h3>Agregar Nuevo Producto</h3>
+      <h3>Agregá un Nuevo Producto...</h3>
       <form id="add-product-form" enctype="multipart/form-data">
         <label for="new-category">Categoría</label>
         <select id="new-category" required></select>
@@ -77,10 +82,11 @@
           <option value="false">Inactivo</option>
         </select>
 
-        <button type="submit">Agregar Producto</button>
+        <button type="submit">Agregá tu Producto</button>
       </form>
     </section>
   </section>
 
   <div id="error-container" style="color: red; font-weight: bold;"></div>
+
 </main>

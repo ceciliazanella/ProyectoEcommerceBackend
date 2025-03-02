@@ -69,7 +69,7 @@ export default class CartManager {
       if (productIndex >= 0) {
         totalQuantity += cart.products[productIndex].quantity;
         if (totalQuantity > stockInitial) {
-          throw new ErrorManager("Sin Stock disponible...", 400);
+          throw new ErrorManager("No hay Stock disponible...", 400);
         }
         cart.products[productIndex].quantity = totalQuantity;
       } else {

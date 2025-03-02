@@ -34,6 +34,19 @@ main {
   justify-content: center;
 }
 
+header {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+}
+
 section {
   margin: 1rem;
   padding: 2rem;
@@ -410,6 +423,7 @@ form {
     opacity: 0;
     top: 0;
   }
+
   to {
     opacity: 1;
     top: 20px;
@@ -418,6 +432,7 @@ form {
 
 .cart-item {
   margin: 4rem;
+  
   display: flex;
   flex-direction: column;
 
@@ -429,4 +444,39 @@ form {
   color: #90323d;
   font-size: 1rem;
   font-weight: 700;
+}
+
+.auth-links {
+  float: right;
+  padding-top: 10px;
+}
+
+.auth-links a {
+  margin-left: 15px;
+
+  color: #333;
+  text-decoration: none;
+}
+
+.auth-links a:hover {
+  color: #ff6600;
+}
+
+input[type="password"] {
+  padding-right: 30px;
+}
+
+.password-container {
+  position: relative;
+}
+
+.eye-icon {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+
+  font-size: 20px;
+
+  transform: translateY(-50%);
+  cursor: pointer;
 }

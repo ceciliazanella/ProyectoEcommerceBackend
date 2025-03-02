@@ -9,7 +9,7 @@ const cartManager = new CartManager();
 export const config = (httpServer) => {
   const socketServer = new Server(httpServer);
   socketServer.on("connection", async (socket) => {
-    console.log("Se estableció conexión...", socket.id);
+    console.log("Se estableció Conexión...", socket.id);
 
     const calculateCartTotal = (products) => {
       return products.reduce(

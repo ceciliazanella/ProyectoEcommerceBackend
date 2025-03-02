@@ -9,7 +9,6 @@ const productManager = new ProductManager();
 router.get("/", async (req, res) => {
   try {
     const stock = req.query.stock !== undefined ? req.query.stock : "all";
-
     if (stock !== "1" && stock !== "all") {
       return res.status(400).json({
         status: "error",

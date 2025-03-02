@@ -1,13 +1,18 @@
 import { connect, Types } from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const connectDB = async () => {
-  const URL =
-    "mongodb+srv://corazon_de_chocolate:1455@cluster0.mulyi.mongodb.net/ecommerce";
+  const URL = process.env.MONGO_URI;
   try {
     await connect(URL);
-    console.log("Estás conectado a MongoDB!");
+    console.log("Ya estás Conectado a MongoDB!");
   } catch (error) {
-    console.log("Hubo un error al conectar con MongoDB...", error.message);
+    console.error(
+      "Mmm... Hubo un Error al querer Conectar con MongoDB...",
+      error
+    );
   }
 };
 

@@ -9,7 +9,6 @@ async function loadCategories() {
     const response = await fetch("/api/products/categories");
 
     const data = await response.json();
-
     if (data.status === "success") {
       categories = data.categories;
 
@@ -24,6 +23,7 @@ async function loadCategories() {
 
 function loadCategoriesToSelect(selectId) {
   const select = document.getElementById(selectId);
+
   select.innerHTML = "";
 
   const allOption = document.createElement("option");
@@ -34,6 +34,7 @@ function loadCategoriesToSelect(selectId) {
 
   categories.forEach((category) => {
     const option = document.createElement("option");
+
     option.value = category;
     option.textContent = category;
     select.appendChild(option);
@@ -192,7 +193,6 @@ function addFilterListeners() {
 async function openEditForm(productId) {
   try {
     const existingForm = document.getElementById("edit-product-form");
-
     if (existingForm) {
       if (existingForm.style.display === "block") {
         existingForm.style.display = "none";
@@ -203,7 +203,6 @@ async function openEditForm(productId) {
       const response = await fetch(`/api/products/${productId}`);
 
       const data = await response.json();
-
       if (data.status === "success") {
         const product = data.payload;
 
@@ -303,7 +302,6 @@ async function updateProduct(productId) {
         "Hubo un Error al querer Actualizar este Producto...",
         "error"
       );
-
       console.error("Error en la Respuesta del Backend:", data.message);
     }
   } catch (error) {

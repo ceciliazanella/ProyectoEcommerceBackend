@@ -1,6 +1,7 @@
 <html lang="es">
 
 <head>
+
   <meta charset="UTF-8" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -9,12 +10,33 @@
     rel="stylesheet" />
   <title>{{title}}</title>
   <link rel="stylesheet" href="/api/public/css/main.css" />
+
 </head>
 
 <body>
+
   <header>
+
     <h1>Corazón de Chocolate</h1>
     <h2>Pastelería Creativa Artesanal</h2>
+
+    <div>
+      {{#if user}}
+      <p>Hola, <span id="username">{{user.first_name}}</span>!</p>
+      <a href="/profile">Mi Perfil</a> |
+      <a href="/api/sessions/logout" id="logoutLink">Cerrar mi ChocoSesión</a>
+      {{else}}
+      <p><a href="/login">Iniciar ChocoSesión</a> |
+        <a href="/register">Crear ChocoCuenta</a>
+      </p>
+      {{/if}}
+    </div>
+
+    <div>
+      <a href="/">Home</a> |
+      <a href="/cart">Carrito</a>
+    </div>
+
   </header>
 
   <main>
@@ -22,9 +44,21 @@
   </main>
 
   <footer>
-    <p>&copy; 2024 Corazón de Chocolate - Pastelería Creativa Artesanal -
-      Todos los derechos reservados.</p>
+    <p>&copy; 2024 Corazón de Chocolate - Pastelería Creativa Artesanal - Todos los Derechos Reservados.</p>
   </footer>
+
+  <script>
+
+    const logoutLink = document.querySelector('#logoutLink');
+    if (logoutLink) {
+      logoutLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        localStorage.removeItem('cartId');
+        window.location.href = '/api/sessions/logout';
+      });
+    }
+
+  </script>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/api/public/js/cart.js"></script>

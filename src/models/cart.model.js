@@ -12,7 +12,7 @@ const cartSchema = new Schema(
         quantity: {
           type: Number,
           required: [true, "La Cantidad es obligatoria..."],
-          min: [1, "La cantidad es 1 por defecto y debe ser mayor que 0..."],
+          min: [1, "La Cantidad es 1 por defecto y debe ser mayor que 0..."],
         },
         total: {
           type: Number,
@@ -28,6 +28,6 @@ const cartSchema = new Schema(
   }
 );
 
-const CartModel = model("carts", cartSchema);
+const CartModel = model("Cart", cartSchema);
 
 export default CartModel;

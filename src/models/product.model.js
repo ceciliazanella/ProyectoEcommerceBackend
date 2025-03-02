@@ -9,8 +9,8 @@ const productSchema = new Schema(
       required: [true, "El Título es obligatorio..."],
       uppercase: true,
       trim: true,
-      minLength: [3, "Debe tener al menos 3 caracteres..."],
-      maxLength: [25, "Debe tener como máximo 25 caracteres..."],
+      minLength: [3, "Debe tener al menos 3 Carácteres..."],
+      maxLength: [25, "Debe tener como máximo 25 Carácteres..."],
     },
     description: {
       type: String,
@@ -25,7 +25,7 @@ const productSchema = new Schema(
     price: {
       type: Number,
       required: [true, "El Precio es obligatorio..."],
-      min: [0, "El precio debe ser un valor positivo"],
+      min: [0, "El Precio tiene que ser un número positivo..."],
     },
     status: {
       type: Boolean,
@@ -34,7 +34,7 @@ const productSchema = new Schema(
     stock: {
       type: Number,
       required: [true, "El Stock es obligatorio..."],
-      min: [0, "El Stock debe ser un valor positivo..."],
+      min: [0, "El Stock tiene que ser un número positivo..."],
     },
     category: {
       type: String,

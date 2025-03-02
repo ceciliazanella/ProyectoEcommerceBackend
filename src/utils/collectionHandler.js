@@ -6,6 +6,7 @@ export const generateId = (collection) => {
   }
 
   let maxId = 0;
+
   collection.forEach((item) => {
     if (item.id > maxId) {
       maxId = item.id;
