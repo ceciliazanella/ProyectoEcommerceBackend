@@ -1,8 +1,8 @@
 <html lang="es">
 
 <head>
-
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -10,54 +10,55 @@
     rel="stylesheet" />
   <title>{{title}}</title>
   <link rel="stylesheet" href="/api/public/css/main.css" />
-
 </head>
 
-<body>
+<body class="body">
 
-  <header>
+  <header class="header">
+    <h1 class="site-title">Corazón de Chocolate</h1>
+    <h2 class="site-subtitle typing">Pastelería Creativa Artesanal</h2>
 
-    <h1>Corazón de Chocolate</h1>
-    <h2>Pastelería Creativa Artesanal</h2>
-
-    <div>
+    <div class="user-info">
       {{#if user}}
-      <p>Hola, <span id="username">{{user.first_name}}</span>!</p>
-      <a href="/profile">Mi Perfil</a> |
-      <a href="/api/sessions/logout" id="logoutLink">Cerrar mi ChocoSesión</a>
+      <p class="user-greeting">Hola,
+        <span id="username" class="highlight">{{user.first_name}}</span>!
+      </p>
+      <a href="/profile" class="nav-link">Mi Perfil</a>
+      |
+      <a href="/api/sessions/logout" id="logoutLink" class="nav-link logout">Cerrar mi ChocoSesión</a>
       {{else}}
-      <p><a href="/login">Iniciar ChocoSesión</a> |
-        <a href="/register">Crear ChocoCuenta</a>
+      <p class="user-action">
+        <a href="/login" class="nav-link">Iniciar ChocoSesión</a>
+        |
+        <a href="/register" class="nav-link">Crear ChocoCuenta</a>
       </p>
       {{/if}}
     </div>
 
-    <div>
-      <a href="/">Home</a> |
-      <a href="/cart">Carrito</a>
-    </div>
-
+    <nav class="nav-menu">
+      <a href="/" class="nav-link">Home</a>
+      |
+      <a href="/cart" class="nav-link">Carrito</a>
+    </nav>
   </header>
 
-  <main>
+  <main class="main-container">
     {{{body}}}
   </main>
 
-  <footer>
-    <p>&copy; 2024 Corazón de Chocolate - Pastelería Creativa Artesanal - Todos los Derechos Reservados.</p>
+  <footer class="footer">
+    <p>&copy; 2024 Corazón de Chocolate - Pastelería Creativa Artesanal -
+      Todos los Derechos Reservados.</p>
   </footer>
 
   <script>
-
-    const logoutLink = document.querySelector('#logoutLink');
-    if (logoutLink) {
+    const logoutLink = document.querySelector('#logoutLink'); if (logoutLink) {
       logoutLink.addEventListener('click', function (e) {
         e.preventDefault();
-        localStorage.removeItem('cartId');
-        window.location.href = '/api/sessions/logout';
+        localStorage.removeItem('cartId'); window.location.href =
+          '/api/sessions/logout';
       });
     }
-
   </script>
 
   <script src="/socket.io/socket.io.js"></script>

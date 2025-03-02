@@ -1,33 +1,45 @@
 import passport from "passport";
-import passportJWT from "passport-jwt";
-import UserModel from "../models/user.model.js";
+import jwt from "passport-jwt";
 
-const ExtractJWT = passportJWT.ExtractJwt;
+const JWTStrategy = jwt.Strategy;
 
-passport.use(
-  new passportJWT.Strategy(
-    {
-      jwtFromRequest: ExtractJWT.fromExtractors([(req) => req.cookies.jwt]),
-      secretOrKey: process.env.JWT_SECRET,
-    },
-    async (jwt_payload, done) => {
-      try {
-        const user = await UserModel.findById(jwt_payload.id).populate("cart");
-        if (!user) {
-          return done(null, false, {
-            message: "Este Usuario no se encuentra...",
-          });
-        }
-        return done(null, user);
-      } catch (error) {
-        return done(error, false);
-      }
-    }
-  )
-);
+const ExtractJwt = jwt.ExtractJwt;
 
 const initializePassport = () => {
-  passport.initialize();
+  passport.use(
+    "current",
+    new JWTStrategy(
+      {
+        jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+        secretOrKey: "process.env.SESSION_SECRET",
+      },
+      async (jwt_payload, done) => {
+        try {
+          return done(null, jwt_payload);
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
 };
+
+const cookieExtractor = (req) => {
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies["chocoCookieToken"];
+  }
+  return token;
+};
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id, (err, user) => {
+    done(err, user);
+  });
+});
 
 export default initializePassport;

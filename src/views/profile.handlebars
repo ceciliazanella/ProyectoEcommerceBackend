@@ -1,25 +1,25 @@
-<main>
+<main class="profile-container">
 
-  <h3>Bienvenido a tu ChocoCuenta <span id="welcome-first_name">{{user.first_name}}</span>!</h3>
+  <h3>Bienvenido/a a tu ChocoCuenta <span id="welcome-first_name" class="highlight">{{user.first_name}}</span>!</h3>
 
   <div id="error-message" class="error-message" style="display:none;"></div>
 
-  <div>
+  <div class="profile-details">
     <h4>Tus Datos de Perfil</h4>
-    <p><strong>Nombre </strong><span id="user-first_name">{{user.first_name}}</span></p>
-    <p><strong>Apellido </strong><span id="user-last_name">{{user.last_name}}</span></p>
-    <p><strong>Correo </strong><span id="user-email">{{user.email}}</span></p>
-    <p><strong>Edad </strong><span id="user-age">{{user.age}}</span> años</p>
+    <p><strong>Nombre: </strong><span id="user-first_name">{{user.first_name}}</span></p>
+    <p><strong>Apellido: </strong><span id="user-last_name">{{user.last_name}}</span></p>
+    <p><strong>Correo: </strong><span id="user-email">{{user.email}}</span></p>
+    <p><strong>Edad: </strong><span id="user-age">{{user.age}}</span> años</p>
   </div>
 
-  <button id="products-button">Ver Productos</button>
-
-  <button id="cart-button">Ver Carrito</button>
+  <div class="buttons-container">
+    <button id="products-button" class="btn-primary" aria-label="Ir a los productos">Ver Productos</button>
+    <button id="cart-button" class="btn-danger" aria-label="Ir al carrito de compras">Ver Carrito</button>
+  </div>
 
 </main>
 
 <script>
-  
   document.getElementById('products-button').addEventListener('click', function () {
     window.location.href = '/';
   });
@@ -27,5 +27,4 @@
   document.getElementById('cart-button').addEventListener('click', function () {
     window.location.href = '/cart';
   });
-
 </script>

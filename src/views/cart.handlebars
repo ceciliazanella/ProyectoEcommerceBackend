@@ -1,29 +1,24 @@
-<header>
+<main class="cart-container">
 
-  <div class="title">
-    <h2>El ChocoCarrito<h3>de Corazón de Chocolate</h3>
-    </h2>
+  <div class="cart-title">
+    <h2>El Chococarrito</h2>
+    <h3>de Corazón de Chocolate</h3>
   </div>
 
-</header>
-
-<main>
-
-  <section>
-    <div id="go-to-home-button">
-      <button onclick="window.location.href='/'">Ver Productos</button>
+  <section class="cart-section">
+    <div class="go-to-home-button">
+      <button class="btn-home" onclick="window.location.href='/'">Ver Productos</button>
     </div>
 
-    <h3>Buscar Producto en tu ChocoCarrito</h3>
-    <input type="text" id="search-input" placeholder="Buscá tu Producto..." />
+    <h3 class="search-product-title">Buscar Producto en tu ChocoCarrito</h3>
+    <input type="text" id="search-input" class="search-input" placeholder="Buscá tu Producto..." />
 
-    <div id="cart-products"></div>
+    <div id="cart-products" class="cart-products"></div>
 
-    <div id="cart-total"></div>
+    <div id="cart-total" class="cart-total"></div>
 
-    <button id="empty-cart-btn">Vaciar tu ChocoCarrito</button>
+    <button id="empty-cart-btn" class="btn-empty-cart">Vaciar tu ChocoCarrito</button>
   </section>
 
-  <div id="message-container"></div>
-
+  <div id="message-container" class="message-container"></div>
 </main>

@@ -193,6 +193,7 @@ function addFilterListeners() {
 async function openEditForm(productId) {
   try {
     const existingForm = document.getElementById("edit-product-form");
+
     if (existingForm) {
       if (existingForm.style.display === "block") {
         existingForm.style.display = "none";
@@ -201,13 +202,12 @@ async function openEditForm(productId) {
       existingForm.style.display = "block";
     } else {
       const response = await fetch(`/api/products/${productId}`);
-
       const data = await response.json();
+
       if (data.status === "success") {
         const product = data.payload;
 
         const editForm = document.createElement("form");
-
         editForm.id = "edit-product-form";
         editForm.enctype = "multipart/form-data";
         editForm.innerHTML = `

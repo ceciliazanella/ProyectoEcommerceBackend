@@ -5,9 +5,46 @@
   box-sizing: border-box;
 }
 
+a {
+  margin: 1rem;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #bc8034;
+}
+
+a:hover {
+  color: #d9cab3;
+  font-size: 1.1rem;
+  text-shadow: 2px 2px 1px #5e0b15;
+}
+
+input {
+  width: 100%;
+  margin: 1.5rem 0;
+  padding: 0.5rem;
+  border-radius: 0.4rem 0.2rem;
+
+  font-family: "Lato", sans-serif;
+  font-size: 0.8rem;
+  font-style: italic;
+  font-weight: 700;
+  color: #90323d;
+}
+
+input:focus {
+  border-color: #bc8034;
+  outline: none;
+}
+
+.form-label {
+  font-family: "Lato", sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #8c7a6b;
+}
+
 body {
-  margin: 4rem;
-  padding: 4rem;
   background-color: #d9cab3;
 
   display: flex;
@@ -21,11 +58,15 @@ body {
   line-height: 1.6;
 }
 
-main {
-  width: 90%;
+
+header {
+  width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 4rem;
+  margin-bottom: 4rem;
+  padding: 2rem;
+  background-color: #5e0b15;
+  border-radius: 1rem 1rem 6rem 1rem;
+  box-shadow: 0px 4px 6px #5e0b15;
 
   display: flex;
   flex-direction: column;
@@ -34,17 +75,54 @@ main {
   justify-content: center;
 }
 
-header {
-  width: 90%;
+header p {
+  font-size: 1.4rem;
+  text-transform: capitalize;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 0.2rem;
+  text-shadow: 1px 1px 1.5px #5e0b157f;
+}
+
+main section div div li div img {
+  width: 350px;
+  height: 250px;
+
+  overflow: hidden;
+  object-fit: cover;
+
+  border: 2px solid #bc8034;
+  border-radius: 1rem 3rem;
+  box-shadow: 1px 1px 4px #5e0b15;
+}
+
+main {
+  width: 70%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
 
   display: flex;
   flex-direction: column;
 
   align-items: center;
   justify-content: center;
+}
+
+main h3 {
+  font-size: 1.8rem
+}
+
+main div h4 {
+  padding: 2rem;
+
+  font-size: 1.4rem;
+}
+
+main p {
+  padding: 0.3rem;
+
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 section {
@@ -63,22 +141,34 @@ section {
 
 h1 {
   font-family: "Lato", sans-serif;
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 800;
   text-transform: uppercase;
-  color: #5e0b15;
+  color: #d9cab3;
   letter-spacing: 0.15rem;
   text-align: center;
-  text-shadow: 1px 0px 2px #5e0b1567;
+  text-shadow: 1px 0px 4px #5e0b1567;
+  animation: colorChange 3s infinite alternate;
+}
+
+@keyframes colorChange {
+  0% {
+    color: #5e0b15;
+  }
+
+  100% {
+    color: #d9cab3;
+  }
 }
 
 h2 {
   font-family: "Corinthia", cursive;
-  font-size: 2.4rem;
+  font-size: 2.8rem;
   font-weight: 600;
   color: #bc8034;
   text-align: center;
-  text-shadow: 1px 0px 1px #5e0b15;
+  text-shadow: 1px 0px 1px #d9cab3;
+  line-height: 2.6rem;
 }
 
 h3 {
@@ -113,6 +203,34 @@ h5 {
   text-align: center;
 }
 
+.user-info a {
+  font-family: "Lato", sans-serif;
+  text-shadow: 1px 1px 4px #bc8034;
+  font-size: 1rem;
+  color: #d9cab3;
+  letter-spacing: 0.2rem;
+  line-height: 1rem;
+}
+
+.user-info a:hover {
+  font-size: 1.2rem;
+  color: #bc8034;
+}
+
+.user-action {
+  margin: 3rem 0;
+  padding: 0;
+}
+
+.user-greeting {
+  animation: colorChange 3s infinite alternate;
+}
+
+.nav-menu {
+  margin: 1rem 0;
+  padding: 0;
+}
+
 p {
   margin: 1rem;
 
@@ -136,6 +254,65 @@ p {
   font-size: 2rem;
   color: #5e0b15;
   text-transform: none;
+}
+
+.register-container .section-title {
+  margin: 2rem 0;
+}
+
+.login-title {
+  margin: 2rem 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+}
+
+.products-container .products-title h2,
+.cart-container .cart-title h2 {
+  font-size: 3rem;
+  text-shadow: 1px 1px 1px #5e0b15;
+}
+
+.products-container .products-title h3,
+.cart-container .cart-title h3 {
+  margin-bottom: 1.8rem;
+  font-size: 1.4rem;
+  letter-spacing: 1;
+  font-weight: 600;
+  text-shadow: 1px 1px 1px #5e0b15;
+  line-height: 1rem;
+}
+
+.products-section h3 {
+  margin: 2rem 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 2px #bc8034;
+}
+
+.filters {
+  margin: 2rem 0;
+  font-family: "Lato", sans-serif;
+  color: #8c7a6b;
+  font-size: 1rem;
+  letter-spacing: 0.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+select {
+  margin: 1rem 0;
+  border: 2px solid #bc8034;
+  border-radius: 0.5rem 12rem;
+  box-shadow: 1px 4px 4px #5e0b15;
+  font-family: "Lato", sans-serif;
+  color: #bc8034;
+  font-size: 0.8rem;
+  letter-spacing: 0.1rem;
+  font-weight: 700;
+  font-style: italic;
+  text-transform: capitalize;
 }
 
 .products {
@@ -185,6 +362,15 @@ button {
 button:hover {
   background-color: #bc8034;
   color: #5e0b15;
+}
+
+.cart-container .cart-section .search-product-title {
+  font-family: "Lato", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #bc8034;
+  text-shadow: 0.5px 0.5px 0.5px #5e0b15;
 }
 
 input[type="file"] {
@@ -430,17 +616,15 @@ form {
   }
 }
 
-.cart-item {
-  margin: 4rem;
-  
-  display: flex;
-  flex-direction: column;
+.cart-container .cart-section .cart-products .cart-item {
+  margin: 1rem;
 
-  align-content: center;
-  justify-items: center;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
 }
 
-.cart-item p {
+.cart-container .cart-section .cart-products .cart-item p {
   color: #90323d;
   font-size: 1rem;
   font-weight: 700;
@@ -479,4 +663,63 @@ input[type="password"] {
 
   transform: translateY(-50%);
   cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body,
+header,
+main,
+footer {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+button:hover {
+  background-color: #bc8034;
+  color: #5e0b15;
+  animation: vibrar 0.2s ease-in-out infinite alternate;
+}
+
+@keyframes vibrar {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(3px);
+  }
+}
+
+.typing {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid #bc8034;
+  width: 0;
+  animation: typingEffect 3s steps(30, end) forwards, blinkCursor 0.8s infinite;
+}
+
+@keyframes typingEffect {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blinkCursor {
+  50% {
+    border-color: transparent;
+  }
 }
