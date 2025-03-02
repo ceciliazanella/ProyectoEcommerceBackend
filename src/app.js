@@ -21,6 +21,8 @@ const PORT = process.env.PORT || 8080;
 
 connectDB();
 
+/*El Archivo .env debería ir en el .gitignore*/
+
 app.use(cookieParser());
 app.use(
   session({
