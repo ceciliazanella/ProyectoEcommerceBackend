@@ -1,26 +1,28 @@
 <main class="login-container">
 
-  <h3 class="login-title">Ingresá a tu ChocoCuenta!</h3>
+  <h3 class="login-title">Ingresá a tu Chococuenta! 🔐</h3>
 
   <div id="error-message" class="error-message" style="display:none;"></div>
 
   <form id="login-form" action="javascript:void(0);" class="login-form">
-    <label for="email" class="form-label">Correo Electrónico</label>
+
+    <label for="email" class="form-label">Correo Electrónico 💌</label>
     <input type="email" id="email" name="email" class="form-input" required
       placeholder="Ingresá tu Correo Electrónico..." />
 
-    <label for="password" class="form-label">Contraseña</label>
+    <label for="password" class="form-label">Contraseña 🔑</label>
     <div class="password-container">
       <input type="password" id="password" name="password" class="form-input" required
         placeholder="Ingresá tu Contraseña..." />
       <span id="toggle-password" class="eye-icon">&#128065;</span>
     </div>
 
-    <button type="submit" class="submit-btn">Iniciá tu ChocoSesión!</button>
+    <button type="submit" class="submit-btn">Iniciá tu Chocosesión! 🥧</button>
+
   </form>
 
   <div class="register-link">
-    <p>¿Todavía no tenés tu ChocoCuenta? <a href="/register" class="register-link-text">Registrate Acá!</a></p>
+    <p>¿Todavía no tenés tu Chococuenta? 🎂 <a href="/register" class="register-link-text">Registrate Acá! 🍪</a></p>
   </div>
 
 </main>
@@ -34,6 +36,7 @@
     errorMessageDiv.style.display = 'none';
 
     const email = document.getElementById('email').value;
+
     const password = document.getElementById('password').value;
 
     try {
@@ -48,20 +51,28 @@
       const data = await response.json();
       if (response.ok) {
         localStorage.setItem('cartId', data.cartId);
-        window.location.replace('/profile');
+
+        localStorage.setItem('role', data.role);
+
+        if (data.role === 'admin') {
+          window.location.replace('/products');
+        } else {
+          window.location.replace('/');
+        }
       } else {
         errorMessageDiv.style.display = 'block';
-        errorMessageDiv.innerHTML = data.message || 'Hay un Error en el Inicio de Sesión...';
+        errorMessageDiv.innerHTML = data.message || '❌ Hubo un error al querer Iniciar tu Chocosesión...';
       }
     } catch (error) {
       console.error('Error:', error);
       errorMessageDiv.style.display = 'block';
-      errorMessageDiv.innerHTML = 'Hubo un Problema al querer Iniciar Sesión...';
+      errorMessageDiv.innerHTML = '❌ Hubo un Problema al querer Iniciar tu Chocosesión...';
     }
   });
 
   document.getElementById('toggle-password').addEventListener('click', function () {
     const passwordField = document.getElementById('password');
+
     const icon = document.getElementById('toggle-password');
 
     if (passwordField.type === 'password') {

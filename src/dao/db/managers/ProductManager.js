@@ -1,6 +1,6 @@
 import ErrorManager from "./ErrorManager.js";
-import { isValidID } from "../config/mongoose.config.js";
-import ProductModel from "../models/product.model.js";
+import { isValidID } from "../../../config/mongoose.config.js";
+import ProductModel from "../../../models/product.model.js";
 import path from "path";
 
 export default class ProductManager {
@@ -12,12 +12,12 @@ export default class ProductManager {
 
   async #findOneById(id) {
     if (!isValidID(id)) {
-      throw new ErrorManager("ID inválido", 400);
+      throw new ErrorManager("❌ ID inválido", 400);
     }
 
     const product = await this.#productModel.findById(id);
     if (!product) {
-      throw new ErrorManager("No se encontró el ID...", 404);
+      throw new ErrorManager("❌ No se encontró el ID...", 404);
     }
     return product;
   }
@@ -84,13 +84,14 @@ export default class ProductManager {
 
   async checkCodeExists(code) {
     const existingProduct = await this.#productModel.findOne({ code });
+
     return existingProduct !== null;
   }
 
   async insertOne(productData, imageFile) {
     if (await this.checkCodeExists(productData.code)) {
       throw new ErrorManager(
-        "Este Código ya está en uso! Ingresá uno nuevo, por favor...",
+        "❌ Este Código ya está en uso! Ingresá uno nuevo, por favor...",
         400
       );
     }
@@ -110,10 +111,11 @@ export default class ProductManager {
 
   async updateOneById(id, productData, imageFile) {
     const product = await this.#findOneById(id);
+
     if (productData.code && productData.code !== product.code) {
       if (await this.checkCodeExists(productData.code)) {
         throw new ErrorManager(
-          "Este Código ya está en uso! Ingresá uno nuevo, por favor!",
+          "❌ Este Código ya está en uso! Ingresá uno nuevo, por favor!",
           400
         );
       }
@@ -132,8 +134,9 @@ export default class ProductManager {
 
   async deleteOneById(id) {
     const product = await this.#findOneById(id);
+    
     if (!product) {
-      throw new ErrorManager("Producto no encontrado", 404);
+      throw new ErrorManager("❌ Producto no encontrado", 404);
     }
     await product.constructor.deleteOne({ _id: id });
     return product;

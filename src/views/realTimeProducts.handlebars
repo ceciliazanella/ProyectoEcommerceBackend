@@ -1,0 +1,55 @@
+<main class="products-container">
+
+  <div class="products-title">
+    <h2>La Chocotienda <span class="emoji">🎁</span></h2>
+    <h3>de Corazón de Chocolate</h3>
+  </div>
+
+  <section class="products-section">
+
+    <h3>Menú de Tortas Artesanales <span class="emoji">🎂</span></h3>
+
+    <div id="go-to-cart-button">
+      <button onclick="window.location.href='/cart'"><span class="emoji">🛒</span></button>
+    </div>
+
+    <div class="products">
+
+      <div class="filters">
+
+        <label for="category">Chocoproductos por Categoría</label>
+        <select id="category">
+          <option value="Todas las Categorías">Todas las Categorías</option>
+        </select>
+
+        <label for="price">Ordenar por Precio</label>
+        <select id="price">
+          <option value="asc">Menor a Mayor</option>
+          <option value="desc">Mayor a Menor</option>
+        </select>
+
+        <label for="availability">Disponibilidad</label>
+        <select id="availability">
+          <option value="all">Todos</option>
+          <option value="available">Disponibles</option>
+        </select>
+
+        <label for="search">Buscar Chocoproducto <span class="emoji">🔎</span></label>
+        <input type="text" id="search" placeholder="Buscá tu Chocoproducto por su Nombre..." />
+
+      </div>
+
+      <div class="products__list">
+        <ul id="products-list">
+        </ul>
+      </div>
+
+      <div id="pagination">
+        <button id="prev-page">◄ Anterior</button>
+        <button id="next-page">Siguiente ►</button>
+      </div>
+    </div>
+
+    <div id="error-container" style="color: red; font-weight: bold;"></div>
+
+</main>

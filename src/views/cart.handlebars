@@ -1,24 +1,100 @@
 <main class="cart-container">
 
   <div class="cart-title">
-    <h2>El Chococarrito</h2>
+    <h2>El Chococarrito 🛒</h2>
     <h3>de Corazón de Chocolate</h3>
   </div>
 
   <section class="cart-section">
+
     <div class="go-to-home-button">
-      <button class="btn-home" onclick="window.location.href='/'">Ver Productos</button>
+      <button class="btn-home" onclick="window.location.href='/'">Ver Chocoproductos 🍩</button>
     </div>
 
-    <h3 class="search-product-title">Buscar Producto en tu ChocoCarrito</h3>
-    <input type="text" id="search-input" class="search-input" placeholder="Buscá tu Producto..." />
+    <h3 class="search-product-title">Buscar tu Producto en tu Chococarrito 🍭</h3>
+    <input type="text" id="search-input" class="search-input" placeholder="Buscá tu Chocoproducto..." />
 
     <div id="cart-products" class="cart-products"></div>
 
     <div id="cart-total" class="cart-total"></div>
 
-    <button id="empty-cart-btn" class="btn-empty-cart">Vaciar tu ChocoCarrito</button>
+    <button id="empty-cart-btn" class="btn-empty-cart">Vaciá tu Chococarrito 🗑️</button>
+
+    <button id="purchase-btn" class="btn-purchase">Finalizá tu Compra ✔</button>
+
   </section>
 
   <div id="message-container" class="message-container"></div>
+
+  <div id="modal" class="modal-container">
+    <div class="modal-content">
+      <div id="modal-message"></div>
+    </div>
+  </div>
+
 </main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const purchaseBtn = document.getElementById('purchase-btn');
+
+    const cartId = localStorage.getItem('cartId');
+
+    const modal = document.getElementById('modal');
+
+    const modalMessage = document.getElementById('modal-message');
+
+    const showModal = (message) => {
+      modalMessage.innerHTML = message;
+      modal.classList.add('active');
+    };
+
+    const closeModal = () => {
+      modal.classList.remove('active');
+    };
+
+    purchaseBtn.addEventListener('click', async () => {
+      try {
+        const response = await fetch(`/api/carts/${cartId}/purchase`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          let modalContent = `
+                            <h4>Tu Compra fue todo un Éxito! 🎉</h4>
+                            <p><strong>Tu Código de Compra es </strong>${data.ticket.code}</p>
+                            <p><strong>💲 Total: </strong>💲${data.ticket.amount}</p>
+                            <p><strong>👤 Comprador:</strong> ${data.ticket.purchaser}</p>
+                        `;
+
+          if (data.failedProducts && data.failedProducts.length > 0) {
+            modalContent += `
+                                <h4>❌ Productos sin Stock</h4>
+                                <p>Estos Chocoproductos siguen estando en tu Carrito:</p>
+                                <ul>${data.failedProducts.map(p => `<li>${p}</li>`).join('')}</ul>
+                            `;
+
+            showModal(modalContent);
+
+            setTimeout(() => { window.location.href = '/cart'; }, 5000);
+          } else {
+            showModal(modalContent);
+
+            setTimeout(() => { window.location.href = '/'; }, 5000);
+          }
+        } else {
+          showModal(`<h4>⚠ Error</h4><p>${data.message}</p>`);
+
+        }
+      } catch (error) {
+        showModal(`<h4>❌ Error</h4><p> Hubo un Problema al querer procesar tu Compra... Intentalo otra vez!</p>`);
+      }
+    });
+  });
+</script>

@@ -1,30 +1,50 @@
 <main class="profile-container">
 
-  <h3>Bienvenido/a a tu ChocoCuenta <span id="welcome-first_name" class="highlight">{{user.first_name}}</span>!</h3>
+  <h3>{{profileMessage}}</h3>
 
   <div id="error-message" class="error-message" style="display:none;"></div>
 
   <div class="profile-details">
-    <h4>Tus Datos de Perfil</h4>
-    <p><strong>Nombre: </strong><span id="user-first_name">{{user.first_name}}</span></p>
-    <p><strong>Apellido: </strong><span id="user-last_name">{{user.last_name}}</span></p>
-    <p><strong>Correo: </strong><span id="user-email">{{user.email}}</span></p>
-    <p><strong>Edad: </strong><span id="user-age">{{user.age}}</span> años</p>
+    <h4>Tus Chocodatos 🔖</h4>
+    <p><strong>Nombre: </strong>{{user.first_name}}</p>
+    <p><strong>Apellido: </strong>{{user.last_name}}</p>
+    <p><strong>💌 Correo: </strong>{{user.email}}</p>
+    <p><strong>🙊 Rol --> </strong>{{user.role}}</p>
   </div>
 
-  <div class="buttons-container">
-    <button id="products-button" class="btn-primary" aria-label="Ir a los productos">Ver Productos</button>
-    <button id="cart-button" class="btn-danger" aria-label="Ir al carrito de compras">Ver Carrito</button>
+  <div class="buttons-container" id="buttons-container">
+    {{#if (eq user.role "admin")}}
+    <button id="admin-button" class="btn-warning">Administrar Productos <span class="emoji">🛠️</span></button>
+    {{else}}
+    <button id="products-button" class="btn-primary"><span class="emoji">🏠</span></button>
+    <button id="cart-button" class="btn-danger"><span class="emoji">🛒</span></button>
+    {{/if}}
   </div>
 
 </main>
 
 <script>
-  document.getElementById('products-button').addEventListener('click', function () {
-    window.location.href = '/';
-  });
+  document.addEventListener("DOMContentLoaded", () => {
+    const adminButton = document.getElementById("admin-button");
+    const productsButton = document.getElementById("products-button");
+    const cartButton = document.getElementById("cart-button");
 
-  document.getElementById('cart-button').addEventListener('click', function () {
-    window.location.href = '/cart';
+    if (adminButton) {
+      adminButton.addEventListener("click", () => {
+        window.location.href = "/products";
+      });
+    }
+
+    if (productsButton) {
+      productsButton.addEventListener("click", () => {
+        window.location.href = "/";
+      });
+    }
+
+    if (cartButton) {
+      cartButton.addEventListener("click", () => {
+        window.location.href = "/cart";
+      });
+    }
   });
 </script>

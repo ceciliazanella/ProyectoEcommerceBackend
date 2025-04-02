@@ -1,128 +1,112 @@
 <main class="register-container">
 
-  <h3 class="section-title">Creá tu ChocoCuenta!</h3>
+  <h3 class="section-title">Creá tu Chococuenta! ✨</h3>
 
   <div id="error-message" class="error-message" style="display:none;"></div>
 
   <form id="register-form" action="javascript:void(0);" class="register-form">
+
     <label for="first_name" class="label">Nombre</label>
     <input type="text" id="first_name" name="first_name" required placeholder="Ingresá tu Nombre..." class="input" />
 
     <label for="last_name" class="label">Apellido</label>
     <input type="text" id="last_name" name="last_name" required placeholder="Ingresá tu Apellido..." class="input" />
 
-    <label for="age" class="label">Edad:</label>
+    <label for="age" class="label">Edad</label>
     <input type="text" id="age" name="age" required placeholder="Ingresá tu Edad..." class="input" />
 
-    <label for="email" class="label">Correo Electrónico</label>
+    <label for="email" class="label">Correo Electrónico 💌</label>
     <input type="email" id="email" name="email" required placeholder="Ingresá tu Correo Electrónico..." class="input" />
 
-    <label for="password" class="label">Contraseña</label>
+    <label for="password" class="label">Contraseña 🔑</label>
     <div class="password-container">
       <input type="password" id="password" name="password" required placeholder="Ingresá tu Contraseña..."
         class="input password" />
       <span id="toggle-password-register" class="eye-icon">&#128065;</span>
     </div>
 
-    <label for="confirm-password" class="label">Confirmar Contraseña</label>
+    <label for="confirm-password" class="label">Confirmar Contraseña 🔐</label>
     <div class="password-container">
       <input type="password" id="confirm-password" name="confirm_password" required
         placeholder="Confirmá tu Contraseña..." class="input password" />
       <span id="toggle-confirm-password" class="eye-icon">&#128065;</span>
     </div>
 
-    <button type="submit" id="submit-button" class="btn-submit">Registrá tu ChocoCuenta!</button>
+    <button type="submit" id="submit-button" class="btn-submit">Registrá tu
+      Chococuenta! ✔</button>
   </form>
 
   <div class="login-link">
-    <p>¿Ya tenés tu ChocoCuenta? <a href="/login" class="link">Iniciá Sesión por Acá!</a></p>
+    <p>¿Ya tenés tu ChocoCuenta? 🙈<a href="/login" class="link">Iniciá Sesión
+        por Acá! 👆</a></p>
   </div>
 
 </main>
 
 <script>
-
-  document.getElementById('register-form').addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    const errorMessageDiv = document.getElementById('error-message');
-    errorMessageDiv.style.display = 'none';
-
-    const password = document.getElementById('password').value;
-    const confirmPassword = document.getElementById('confirm-password').value;
-
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
-    if (!passwordRegex.test(password)) {
-      errorMessageDiv.style.display = 'block';
-      errorMessageDiv.innerHTML = 'Tu Contraseña tiene que tener al menos 6 Carácteres... Incluída una Mayúscula y un Número!';
-      return;
-    }
-    if (password !== confirmPassword) {
-      errorMessageDiv.style.display = 'block';
-      errorMessageDiv.innerHTML = 'Las Contraseñas Ingresadas no coinciden...';
-      return;
-    }
-
-    const userData = {
-      first_name: document.getElementById('first_name').value,
-      last_name: document.getElementById('last_name').value,
-      age: document.getElementById('age').value,
-      email: document.getElementById('email').value,
-      password,
-    };
-
-    try {
-      const response = await fetch('/api/sessions/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        localStorage.setItem('cartId', data.cartId);
-        window.location.href = '/login';
-      } else {
+  document.getElementById('register-form').addEventListener('submit', async
+  function (e) {
+      e.preventDefault(); const errorMessageDiv =
+        document.getElementById('error-message'); errorMessageDiv.style.display =
+          'none'; const password = document.getElementById('password').value; const
+            confirmPassword = document.getElementById('confirm-password').value; const
+              passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/; if
+        (!passwordRegex.test(password)) {
         errorMessageDiv.style.display = 'block';
-        errorMessageDiv.innerHTML = data.message || 'Hubo un Error al querer Crear tu ChocoCuenta...';
+        errorMessageDiv.innerHTML = 'Tu Contraseña tiene que tener al menos 6 Carácteres...Incluída una Mayúscula y un Número!'; return;
+      } if (password !==
+        confirmPassword) {
+        errorMessageDiv.style.display = 'block';
+        errorMessageDiv.innerHTML = 'Las Contraseñas Ingresadas no coinciden...';
+        return;
+      } const userData = {
+        first_name:
+          document.getElementById('first_name').value, last_name:
+          document.getElementById('last_name').value, age:
+          document.getElementById('age').value, email:
+          document.getElementById('email').value, password,
+      }; try {
+        const response =
+          await fetch('/api/sessions/register', {
+            method: 'POST', headers: {
+              'Content-Type': 'application/json',
+            }, body: JSON.stringify(userData),
+          });
+        const data = await response.json(); if (response.ok) {
+          localStorage.setItem('cartId', data.cartId); window.location.href = '/login';
+        } else {
+          errorMessageDiv.style.display = 'block'; errorMessageDiv.innerHTML =
+            data.message || '❌ Hubo un Error al querer Crear tu Chococuenta...';
+        }
       }
-    } catch (error) {
-      console.error('Error:', error);
-      errorMessageDiv.style.display = 'block';
-      errorMessageDiv.innerHTML = 'Hubo un Problema al querer Registrar tu ChocoCuenta...';
-    }
-  });
-
-  document.getElementById('toggle-password-register').addEventListener('click', function () {
-
-    const passwordField = document.getElementById('password');
-
-    const icon = document.getElementById('toggle-password-register');
-
-    if (passwordField.type === 'password') {
-      passwordField.type = 'text';
-      icon.innerHTML = '&#128064;';
-    } else {
-      passwordField.type = 'password';
-      icon.innerHTML = '&#128065;';
-    }
-  });
-
-  document.getElementById('toggle-confirm-password').addEventListener('click', function () {
-
-    const confirmPasswordField = document.getElementById('confirm-password');
-
-    const icon = document.getElementById('toggle-confirm-password');
-
-    if (confirmPasswordField.type === 'password') {
-      confirmPasswordField.type = 'text';
-      icon.innerHTML = '&#128064;';
-    } else {
-      confirmPasswordField.type = 'password';
-      icon.innerHTML = '&#128065;';
-    }
-  });
-
+      catch (error) {
+        console.error('Error:', error); errorMessageDiv.style.display
+          = 'block'; errorMessageDiv.innerHTML = '❌ Hubo un Problema al querer Registrar tu Chococuenta...';
+      }
+    });
+  document.getElementById('toggle-password-register').addEventListener('click',
+    function () {
+      const passwordField = document.getElementById('password'); const
+        icon = document.getElementById('toggle-password-register'); if
+        (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        icon.innerHTML = '&#128064;';
+      } else {
+        passwordField.type = 'password';
+        icon.innerHTML = '&#128065;';
+      }
+    });
+  document.getElementById('toggle-confirm-password').addEventListener('click',
+    function () {
+      const confirmPasswordField =
+        document.getElementById('confirm-password'); const icon =
+          document.getElementById('toggle-confirm-password'); if
+        (confirmPasswordField.type === 'password') {
+        confirmPasswordField.type =
+          'text'; icon.innerHTML = '&#128064;';
+      } else {
+        confirmPasswordField.type =
+          'password'; icon.innerHTML = '&#128065;';
+      }
+    });
 </script>

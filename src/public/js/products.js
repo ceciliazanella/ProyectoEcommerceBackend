@@ -17,7 +17,10 @@ async function loadCategories() {
       loadCategoriesToSelect("new-category");
     }
   } catch (error) {
-    console.error("Hubo un Error al querer Cargar las Categorías...:", error);
+    console.error(
+      "❌ Hubo un Error al querer Cargar las Categorías...:",
+      error
+    );
   }
 }
 
@@ -70,28 +73,50 @@ async function loadProductsList(page = 1) {
     const response = await fetch(url);
 
     const data = await response.json();
-    if (data.status === "success") {
-      renderProducts(data.payload.docs);
 
-      updatePagination(data.payload.page, data.payload.totalPages);
+    if (data.status === "success") {
+      renderProducts(data.payload.products);
+
+      updatePagination(data.payload.currentPage, data.payload.totalPages);
     } else {
-      showNotification("No se encontraron Productos...", "error");
+      showNotification("❌ No se encontraron Productos...", "error");
     }
   } catch (error) {
-    console.error("Hubo un Error al querer Cargar los Productos...:", error);
+    console.error("❌ Hubo un Error al querer Cargar los Productos...:", error);
   }
+}
+
+function addFilterListeners() {
+  document.getElementById("category").addEventListener("change", function () {
+    loadProductsList(1);
+  });
+  document.getElementById("price").addEventListener("change", function () {
+    loadProductsList(1);
+  });
+  document
+    .getElementById("availability")
+    .addEventListener("change", function () {
+      loadProductsList(1);
+    });
+  document.getElementById("search").addEventListener("input", function () {
+    loadProductsList(1);
+  });
 }
 
 function renderProducts(products) {
   const productList = document.getElementById("products-list");
   productList.innerHTML = "";
   if (products.length === 0) {
-    productList.innerHTML = "<p>No se encontraron Productos...</p>";
+    productList.innerHTML = "<p>❌ No se encontraron Productos...</p>";
     return;
   }
+
+  const isOnProductsPage = window.location.pathname === "/products";
+
+  const isOnHomePage = window.location.pathname === "/";
+
   products.forEach((product) => {
     const productItem = document.createElement("li");
-
     productItem.classList.add("product-item");
 
     const availability = product.stock > 0 ? "Disponible" : "No disponible";
@@ -100,32 +125,47 @@ function renderProducts(products) {
       product.thumbnails && product.thumbnails.length > 0
         ? product.thumbnails[0]
         : "./images/default-product-image.webp";
-    productItem.innerHTML = `
+
+    let productHTML = `
       <div class="product" id="product-${product._id}">
         <h4>${product.title}</h4>
         <img src="${productImage}" alt="${product.title}" />
-        <p id="price-${product._id}">Precio $${product.price.toFixed(2)}</p>
+        <p id="price-${product._id}">Precio 💲${product.price.toFixed(2)}</p>
         <button onclick="toggleDetails('${product._id}', '${
       product.description
-    }')">Ver Detalles</button>
+    }')">Ver Detalles 🔍</button>
         <div id="details-${
           product._id
         }" class="product-details" style="display: none;"></div>
-        <button onclick="addToCart('${product._id}')" id="add-to-cart-${
-      product._id
-    }" ${product.stock === 0 ? "disabled" : ""}>${
-      product.stock === 0 ? "Sin stock" : "Agregar al Carrito"
-    }</button>
-        <button onclick="openEditForm('${product._id}')">Modificar</button>
-        <button onclick="deleteProduct('${product._id}')">Eliminar</button>
-      </div>
     `;
+
+    if (isOnHomePage) {
+      productHTML += `
+        <button onclick="addToCart('${product._id}')" id="add-to-cart-${
+        product._id
+      }" ${product.stock === 0 ? "disabled" : ""}>${
+        product.stock === 0 ? "Sin stock" : "Agregar al Carrito 🛒"
+      }</button>
+      `;
+    }
+
+    if (isOnProductsPage) {
+      productHTML += `
+        <button onclick="openEditForm('${product._id}')">Modificar ✏️</button>
+        <button onclick="deleteProduct('${product._id}')">Eliminar 🗑️</button>
+      `;
+    }
+
+    productHTML += "</div>";
+
+    productItem.innerHTML = productHTML;
     productList.appendChild(productItem);
   });
 }
 
 function toggleDetails(productId, description) {
   const detailsDiv = document.getElementById(`details-${productId}`);
+
   if (detailsDiv.style.display === "none") {
     detailsDiv.style.display = "block";
     detailsDiv.innerHTML = `<p>${description}</p>`;
@@ -160,7 +200,7 @@ function changePage(newPage) {
   loadProductsList(newPage);
 }
 
-function showNotification(message, type = "success") {
+window.showNotification = function (message, type = "success") {
   const notification = document.createElement("div");
 
   notification.classList.add("notification");
@@ -171,24 +211,7 @@ function showNotification(message, type = "success") {
   setTimeout(() => {
     notification.remove();
   }, 3000);
-}
-
-function addFilterListeners() {
-  document.getElementById("category").addEventListener("change", function () {
-    loadProductsList(1);
-  });
-  document.getElementById("price").addEventListener("change", function () {
-    loadProductsList(1);
-  });
-  document
-    .getElementById("availability")
-    .addEventListener("change", function () {
-      loadProductsList(1);
-    });
-  document.getElementById("search").addEventListener("input", function () {
-    loadProductsList(1);
-  });
-}
+};
 
 async function openEditForm(productId) {
   try {
@@ -202,16 +225,18 @@ async function openEditForm(productId) {
       existingForm.style.display = "block";
     } else {
       const response = await fetch(`/api/products/${productId}`);
+
       const data = await response.json();
 
       if (data.status === "success") {
         const product = data.payload;
 
         const editForm = document.createElement("form");
+
         editForm.id = "edit-product-form";
         editForm.enctype = "multipart/form-data";
         editForm.innerHTML = `
-          <h3>Modificar Producto</h3>
+          <h3>Modificar Producto ✏️</h3>
           <label for="title">Título</label>
           <input type="text" id="edit-title" name="title" value="${
             product.title
@@ -234,7 +259,7 @@ async function openEditForm(productId) {
           }" required>
           <label for="category">Categoría</label>
           <select id="edit-category" name="category" required></select>
-          <button type="submit">Guardar Cambios</button>
+          <button type="submit">Guardar Cambios 💾</button>
         `;
 
         const productContainer = document.getElementById(
@@ -254,7 +279,7 @@ async function openEditForm(productId) {
     }
   } catch (error) {
     console.error(
-      "Hubo un Error al querer Cargar el Formulario de Edición...:",
+      "❌ Hubo un Error al querer Cargar el Formulario de Edición...:",
       error
     );
   }
@@ -294,24 +319,28 @@ async function updateProduct(productId) {
     const data = await response.json();
 
     if (data.status === "success") {
-      showNotification("Este Producto se Actualizó Éxitosamente!", "success");
+      showNotification(
+        "✔️ Este Chocoproducto se Actualizó Éxitosamente!",
+        "success"
+      );
 
       loadProductsList(currentPage);
     } else {
       showNotification(
-        "Hubo un Error al querer Actualizar este Producto...",
+        "❌ Hubo un Error al querer Actualizar este Chocoproducto...",
         "error"
       );
-      console.error("Error en la Respuesta del Backend:", data.message);
+
+      console.error("❌ Error en la Respuesta del Backend:", data.message);
     }
   } catch (error) {
     console.error(
-      "Hubo un Error al querer Actualizar este Producto...:",
+      "❌ Hubo un Error al querer Actualizar este Producto...:",
       error
     );
 
     showNotification(
-      "Hubo un Error al querer Actualizar este Producto...",
+      "❌ Hubo un Error al querer Actualizar este Chocoproducto...",
       "error"
     );
   }
@@ -352,9 +381,9 @@ function createAddProductForm() {
       <option value="false">Inactivo</option>
     </select>
 
-    <button type="submit">Agregar Producto</button>
+    <button type="submit">Guardar Nuevo Producto 💾</button>
   `;
-  addProductSection.innerHTML = "<h3>Agregar Producto</h3>";
+  addProductSection.innerHTML = "<h3>Agregar Producto 🎂</h3>";
   addProductSection.appendChild(addForm);
 
   loadCategoriesToSelect("new-category");
@@ -408,7 +437,7 @@ async function addProduct() {
     const data = await response.json();
 
     if (data.status === "success") {
-      showNotification("Este Producto se Agregó Éxitosamente!", "success");
+      showNotification("✔️ Este Chocoproducto se Agregó Éxitosamente!", "success");
 
       loadProductsList(currentPage);
     } else {
@@ -416,7 +445,7 @@ async function addProduct() {
     }
   } catch (error) {
     showNotification(
-      "Hubo un Error al querer Agregar este Producto...:",
+      "❌ Hubo un Error al querer Agregar este Chocoproducto...:",
       "error"
     );
   }
@@ -431,33 +460,26 @@ async function deleteProduct(productId) {
     const data = await response.json();
 
     if (data.status === "success") {
-      showNotification("Este Producto se eliminó Éxitosamente!", "success");
+      showNotification("✔️ Este Chocoproducto se Eliminó Éxitosamente!", "success");
 
       loadProductsList(currentPage);
     } else {
       showNotification(
-        "Hubo un Error al querer Eliminar este Producto...",
+        "❌ Hubo un Error al querer Eliminar este Chocoproducto...",
         "error"
       );
     }
   } catch (error) {
     showNotification(
-      "Hubo un Error al querer Eliminar este Producto...",
+      "❌ Hubo un Error al querer Eliminar este Chocoproducto...",
       "error"
     );
   }
 }
 
-loadCategories();
-
-loadProductsList(currentPage);
-
-createAddProductForm();
-
-addFilterListeners();
-
 function showNotification(message, type = "success") {
   const notification = document.createElement("div");
+
   notification.classList.add("notification");
   if (type === "success") {
     notification.style.backgroundColor = "green";
@@ -470,3 +492,11 @@ function showNotification(message, type = "success") {
     notification.remove();
   }, 3000);
 }
+
+loadCategories();
+
+loadProductsList(currentPage);
+
+createAddProductForm();
+
+addFilterListeners();

@@ -1,21 +1,21 @@
 <main class="products-container">
 
   <div class="products-title">
-    <h2>La Chocotienda</h2>
+    <h2>La Chocoadmin 🛠️</h2>
     <h3>de Corazón de Chocolate</h3>
   </div>
 
   <section class="products-section">
-    <h3>Menú de Tortas Artesanales</h3>
 
-    <div id="go-to-cart-button">
-      <button onclick="window.location.href='/cart'">Ir al Carrito</button>
-    </div>
+    <h3>Administración de Productos 🔧</h3>
+
+    <h4>Menú de Tortas Artesanales 🎂</h4>
 
     <div class="products">
+
       <div class="filters">
 
-        <label for="category">Categoría</label>
+        <label for="category">Chocoproductos por Categoría</label>
         <select id="category">
           <option value="Todas las Categorías">Todas las Categorías</option>
         </select>
@@ -32,8 +32,8 @@
           <option value="available">Disponibles</option>
         </select>
 
-        <label for="search">Buscar Producto</label>
-        <input type="text" id="search" placeholder="Buscá tu Producto por su Nombre..." />
+        <label for="search">Buscar Chocoproducto 🔎</label>
+        <input type="text" id="search" placeholder="Buscá el Chocoproducto por su Nombre..." />
       </div>
 
       <div class="products__list">
@@ -42,14 +42,21 @@
       </div>
 
       <div id="pagination">
-        <button id="prev-page">Anterior</button>
-        <button id="next-page">Siguiente</button>
+
+        <button id="prev-page">◄ Anterior</button>
+
+        <button id="next-page">Siguiente ►</button>
+
       </div>
+
     </div>
 
     <section id="addProductForm">
-      <h3>Agregá un Nuevo Producto...</h3>
+
+      <h3>Agregá un Nuevo Chocoproducto... 🍬</h3>
+
       <form id="add-product-form" enctype="multipart/form-data">
+
         <label for="new-category">Categoría</label>
         <select id="new-category" required>
         </select>
@@ -78,9 +85,12 @@
           <option value="false">Inactivo</option>
         </select>
 
-        <button type="submit">Agregá tu Producto</button>
+        <button type="submit">Guardá tu Nuevo Chocoproducto! 🍪</button>
+
       </form>
+
     </section>
+
   </section>
 
   <div id="error-container" style="color: red; font-weight: bold;"></div>

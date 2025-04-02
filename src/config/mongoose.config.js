@@ -1,21 +1,38 @@
-import { connect, Types } from "mongoose";
+import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-export const connectDB = async () => {
-  const URL = process.env.MONGO_URI;
-  try {
-    await connect(URL);
-    console.log("Ya estás Conectado a MongoDB!");
-  } catch (error) {
-    console.error(
-      "Mmm... Hubo un Error al querer Conectar con MongoDB...",
-      error
-    );
-  }
-};
+class MongoSingleton {
+  static #instance;
 
-export const isValidID = (id) => {
-  return Types.ObjectId.isValid(id);
-};
+  constructor() {
+    if (MongoSingleton.#instance) {
+      throw new Error("❌ Ya existe una Instancia de MongoSingleton...");
+    }
+    this.#connect();
+    MongoSingleton.#instance = this;
+  }
+
+  async #connect() {
+    try {
+      await mongoose.connect(process.env.MONGO_URI);
+      console.log("🔗 Esa! ;) Ya estás Conectado a tu Base de MongoDB!");
+    } catch (error) {
+      console.error(
+        "❌ Hubo un Error al querer Conectar con MongoDB...:",
+        error
+      );
+      process.exit(1);
+    }
+  }
+
+  static getInstance() {
+    if (!MongoSingleton.#instance) {
+      MongoSingleton.#instance = new MongoSingleton();
+    }
+    return MongoSingleton.#instance;
+  }
+}
+
+export default MongoSingleton;

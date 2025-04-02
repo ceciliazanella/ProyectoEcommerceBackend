@@ -7,6 +7,7 @@ export default class ErrorManager extends Error {
   static handleError(error) {
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((item) => item.message);
+
       return new ErrorManager(messages.join(",").trim(), 400);
     }
     if (error.code === 11000) {

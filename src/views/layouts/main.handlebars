@@ -13,32 +13,33 @@
 </head>
 
 <body class="body">
-
   <header class="header">
+
     <h1 class="site-title">Corazón de Chocolate</h1>
+
     <h2 class="site-subtitle typing">Pastelería Creativa Artesanal</h2>
 
     <div class="user-info">
       {{#if user}}
       <p class="user-greeting">Hola,
-        <span id="username" class="highlight">{{user.first_name}}</span>!
+        <span id="username" class="highlight">{{user.first_name}} 🍰</span>!
       </p>
-      <a href="/profile" class="nav-link">Mi Perfil</a>
+      <a href="/profile" class="nav-link">Tu Chocoperfil 🧁</a>
       |
-      <a href="/api/sessions/logout" id="logoutLink" class="nav-link logout">Cerrar mi ChocoSesión</a>
+      <a href="/api/sessions/logout" id="logoutLink" class="nav-link logout">Cerrar mi Chocosesión 🔒</a>
       {{else}}
       <p class="user-action">
-        <a href="/login" class="nav-link">Iniciar ChocoSesión</a>
+        <a href="/login" class="nav-link">Iniciá tu Chocosesión <span class="emoji">🔑</span></a>
         |
-        <a href="/register" class="nav-link">Crear ChocoCuenta</a>
+        <a href="/register" class="nav-link">Creá tu Chococuenta <span class="emoji">🍫</span></a>
       </p>
       {{/if}}
     </div>
 
     <nav class="nav-menu">
-      <a href="/" class="nav-link">Home</a>
+      <a href="/" class="nav-link"><span class="emoji">🏠</span></a>
       |
-      <a href="/cart" class="nav-link">Carrito</a>
+      <a href="/cart" class="nav-link"><span class="emoji">🛒</span></a>
     </nav>
   </header>
 
@@ -52,18 +53,37 @@
   </footer>
 
   <script>
-    const logoutLink = document.querySelector('#logoutLink'); if (logoutLink) {
-      logoutLink.addEventListener('click', function (e) {
-        e.preventDefault();
-        localStorage.removeItem('cartId'); window.location.href =
-          '/api/sessions/logout';
-      });
-    }
+    document.addEventListener("DOMContentLoaded", () => {
+      const logoutLink = document.querySelector("#logoutLink");
+
+      if (logoutLink) {
+        logoutLink.addEventListener("click", async (e) => {
+          e.preventDefault();
+          try {
+            const response = await fetch("/api/sessions/logout", { method: "GET" });
+
+            if (response.ok) {
+              localStorage.removeItem("cartId");
+
+              localStorage.removeItem("role");
+
+              window.location.href = "/";
+            } else {
+              console.error("❌ Hubo un error al cerrar la Chocosesión...");
+            }
+          } catch (error) {
+            console.error("❌ Hubo un error al cerrar la Chocosesión: ", error);
+          }
+        });
+      }
+    });
   </script>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/api/public/js/cart.js"></script>
+  <script src="/api/public/js/filters.js"></script>
   <script src="/api/public/js/products.js"></script>
+  <script src="/api/public/js/cart.js"></script>
+  <script src="/api/public/js/notifications.js"></script>
 
 </body>
 

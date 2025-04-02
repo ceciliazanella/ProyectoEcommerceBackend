@@ -1,22 +1,41 @@
 import jwt from "jsonwebtoken";
+import User from "../models/user.model.js";
 
-export const verifyTokenExpiration = (req, res, next) => {
-  const token = req.cookies.jwt || req.headers.authorization?.split(" ")[1];
-  if (!token) {
-    return res.status(401).json({ message: "No se otorgó un Token..." });
-  }
+export const authMiddleware = async (req, res, next) => {
   try {
+    const token = req.cookies.jwt;
+
+    console.log("El Token recibido es:", token);
+
+    if (!token) {
+      return res.redirect("/login");
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.userId;
+
+    console.log("El Token decodificado es:", decoded);
+
+    const user = await User.findById(decoded._id).lean();
+
+    console.log("✔️ Usuario encontrado:", user);
+
+    if (!user) {
+      return res.redirect("/login");
+    }
+
+    req.user = user;
+    console.log("👤 User:", req.user);
+
     next();
-  } catch (err) {
-    const errorMessage =
-      err.name === "TokenExpiredError"
-        ? "El Token expiró."
-        : "El Token es Inválido...";
-    return res.status(401).json({
-      message: errorMessage,
-      error: err.message,
-    });
+  } catch (error) {
+    console.error("❌ Hubo un Error al querer Ingresar a la Chococuenta...:", error);
+
+    if (error.name === "TokenExpiredError") {
+      res.clearCookie("jwt");
+      return res.redirect("/login"); 
+    }
+
+    return res.redirect("/login");
   }
 };
+
