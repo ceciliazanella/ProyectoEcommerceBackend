@@ -61,7 +61,7 @@ app.use("/api/sessions", sessionsRouter);
 app.use("/", homeViewRouter);
 
 app.use("*", (req, res) => {
-  res.status(404).render("❌ error404", { title: "❌ Error 404" });
+  res.status(404).render("error404", { title: "❌ Error 404" });
 });
 
 app.use((err, req, res, next) => {

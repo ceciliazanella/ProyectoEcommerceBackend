@@ -28,59 +28,54 @@
 </main>
 
 <script>
-  document.getElementById('login-form').addEventListener('submit', async function (e) {
-    e.preventDefault();
+  document.addEventListener("DOMContentLoaded", function () {
+    const loginForm = document.getElementById('login-form');
 
     const errorMessageDiv = document.getElementById('error-message');
 
-    errorMessageDiv.style.display = 'none';
+    const togglePassword = document.getElementById('toggle-password');
 
-    const email = document.getElementById('email').value;
+    if (loginForm) {
+      loginForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        errorMessageDiv.style.display = 'none';
 
-    const password = document.getElementById('password').value;
+        const email = document.getElementById('email').value;
 
-    try {
-      const response = await fetch('/api/sessions/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+        const password = document.getElementById('password').value;
 
-      const data = await response.json();
-      if (response.ok) {
-        localStorage.setItem('cartId', data.cartId);
+        try {
+          const response = await fetch('/api/sessions/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+          });
 
-        localStorage.setItem('role', data.role);
+          const data = await response.json();
+          if (response.ok) {
+            localStorage.setItem('cartId', data.cartId);
+            localStorage.setItem('role', data.role);
 
-        if (data.role === 'admin') {
-          window.location.replace('/products');
-        } else {
-          window.location.replace('/');
+            window.location.replace(data.role === 'admin' ? '/products' : '/');
+          } else {
+            errorMessageDiv.style.display = 'block';
+            errorMessageDiv.innerHTML = data.message || '❌ Hubo un error al querer Iniciar tu Chocosesión...';
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          errorMessageDiv.style.display = 'block';
+          errorMessageDiv.innerHTML = '❌ Hubo un Problema al querer Iniciar tu Chocosesión...';
         }
-      } else {
-        errorMessageDiv.style.display = 'block';
-        errorMessageDiv.innerHTML = data.message || '❌ Hubo un error al querer Iniciar tu Chocosesión...';
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      errorMessageDiv.style.display = 'block';
-      errorMessageDiv.innerHTML = '❌ Hubo un Problema al querer Iniciar tu Chocosesión...';
+      });
     }
-  });
 
-  document.getElementById('toggle-password').addEventListener('click', function () {
-    const passwordField = document.getElementById('password');
-
-    const icon = document.getElementById('toggle-password');
-
-    if (passwordField.type === 'password') {
-      passwordField.type = 'text';
-      icon.innerHTML = '&#128064;';
-    } else {
-      passwordField.type = 'password';
-      icon.innerHTML = '&#128065;';
+    if (togglePassword) {
+      togglePassword.addEventListener('click', function () {
+        const passwordField = document.getElementById('password');
+        
+        passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+        togglePassword.innerHTML = passwordField.type === 'password' ? '&#128065;' : '&#128064;';
+      });
     }
   });
 </script>
